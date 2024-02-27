@@ -1,0 +1,64 @@
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 10px;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1rem;
+  padding: 10px 20px;
+  text-transform: uppercase;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos para el lado de los Datos de Contacto */
+.col-md-6:last-child {
+  border-left: 1px solid #ccc;
+  padding-left: 40px;
+}
+
+.col-md-6:last-child h2 {
+  margin-top: 0;
+}
+
+.col-md-6:last-child p {
+  margin-bottom: 10px;
+}
+
+/* Media Query para hacer el formulario responsive */
+@media (max-width: 768px) {
+  .col-md-6 {
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  .col-md-6:last-child {
+    border-left: none;
+    padding-left: 0;
+  }
+}

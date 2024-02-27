@@ -1,0 +1,35 @@
+.about-section {
+  padding: 80px 0;
+}
+
+.about-heading {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.about-content {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 40px;
+}
+
+.about-content p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Estilos adicionales para mejorar la apariencia */
+.about-heading h2 {
+  color: #333;
+}
+
+.about-content p:first-of-type {
+  margin-top: 0;
+}
+
+.about-content p:last-of-type {
+  margin-bottom: 0;
+}
