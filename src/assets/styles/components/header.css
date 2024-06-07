@@ -1,45 +1,98 @@
-.container {
-  margin: 0 auto;
-  max-width: 1200px;
-  padding: 20px;
+body {
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-#app {
-  color: #2c3e50;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Header */
+.header {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+  position: absolute; /* Fija el header */
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
-nav {
-  padding: 15px 30px;
+.navbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
 }
 
-nav a {
-  color: #2c3e50;
-  font-weight: bold;
-  transition: color 0.3s ease;
+.logo a img {
+  height: 40px; /* Ajusta el tamaño del logo según sea necesario */
 }
 
-nav a:hover {
-  color: #42b983;
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+.nav-links li {
+  margin-left: 2rem;
 }
 
-.navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+.nav-links a {
+  color: #333;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  position: relative;
+  text-decoration: none;
 }
 
-.offcanvas-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-.fondo-carro {
-  bottom: 10px;
+.nav-links a::after {
+  background: #333;
+  bottom: -5px;
+  content: "";
+  display: block;
+  height: 2px;
+  left: 0;
   position: absolute;
-  width: 90%;
-  z-index: 1030;
+  transition: width 0.3s;
+  width: 0;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.menu-icon {
+  cursor: pointer;
+  display: none;
+}
+
+.menu-icon i {
+  color: #333;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none;
+    flex-direction: column;
+    left: 0;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .nav-links li {
+    margin: 1rem 0;
+    text-align: center;
+  }
+
+  .menu-icon {
+    display: block;
+  }
 }

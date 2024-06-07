@@ -1,0 +1,418 @@
+.carousel {
+  margin-top: 20px;
+}
+.item .thumb {
+  cursor: pointer;
+  float: left;
+  width: 25%;
+}
+.item .thumb img {
+  margin: 2px;
+  object-fit: cover;
+  width: 100%;
+}
+.item img {
+  width: 100%;
+}
+/*Titulo*/
+.product-name {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 22px;
+  margin-bottom: 4px;
+}
+/*Precio*/
+.product-price-discount {
+  clear: both;
+  font-size: 22px;
+  font-weight: 400;
+  padding: 10px 0;
+}
+.product-price-discount span.line-through {
+  color: #a5a5a5;
+  font-size: 14px;
+  margin-left: 10px;
+  text-decoration: line-through;
+  vertical-align: middle;
+}
+/* Cantidad */
+.product-count {
+  margin-top: 15px;
+}
+
+.product-count label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.qty-controls {
+  align-items: center;
+  display: flex;
+}
+
+.product-count .qtyminus,
+.product-count .qtyplus {
+  background: #212529;
+  color: #fff;
+  cursor: pointer;
+  font-size: 19px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  width: 34px;
+}
+
+.product-count .qtyminus {
+  border-radius: 3px 0 0 3px;
+}
+
+.product-count .qtyplus {
+  border-radius: 0 3px 3px 0;
+}
+
+.product-count .qty {
+  text-align: center;
+  width: 60px;
+}
+
+/* Botón */
+.round-black-btn {
+  background: #212529;
+  border: solid 2px #212529;
+  border-radius: 4px;
+  color: #fff;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 7px 45px;
+  transition: all 0.5s ease-in-out 0s;
+}
+
+.round-black-btn:hover,
+.round-black-btn:focus {
+  background: transparent;
+  color: #212529;
+  text-decoration: none;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  outline: none;
+}
+.product-count {
+  margin-top: 15px;
+}
+.product-count .qtyminus,
+.product-count .qtyplus {
+  background: #212529;
+  color: #fff;
+  cursor: pointer;
+  font-size: 19px;
+  height: 34px;
+  line-height: 36px;
+  text-align: center;
+  width: 34px;
+}
+.product-count .qtyminus {
+  border-radius: 3px 0 0 3px;
+}
+.product-count .qtyplus {
+  border-radius: 0 3px 3px 0;
+}
+.product-count .qty {
+  text-align: center;
+  width: 60px;
+}
+.round-black-btn {
+  background: #212529;
+  border: solid 2px #212529;
+  border-radius: 4px;
+  color: #fff;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 7px 45px;
+  transition: all 0.5s ease-in-out 0s;
+}
+.round-black-btn:hover,
+.round-black-btn:focus {
+  background: transparent;
+  color: #212529;
+  text-decoration: none;
+}
+
+.product-info-tabs {
+  margin-top: 25px;
+}
+.product-info-tabs .nav-tabs {
+  border-bottom: 2px solid #d8d8d8;
+}
+.product-info-tabs .nav-tabs .nav-item {
+  margin-bottom: 0;
+}
+.product-info-tabs .nav-tabs .nav-link {
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #323232;
+}
+.product-info-tabs .nav-tabs .nav-item .nav-link:hover {
+  border: none;
+}
+.product-info-tabs .nav-tabs .nav-item.show .nav-link,
+.product-info-tabs .nav-tabs .nav-link.active,
+.product-info-tabs .nav-tabs .nav-link.active:hover {
+  border: none;
+  border-bottom: 2px solid #d8d8d8;
+  font-weight: bold;
+}
+.product-info-tabs .tab-content .tab-pane {
+  color: #7a7a7a;
+  font-size: 15px;
+  line-height: 24px;
+  padding: 30px 20px;
+}
+.review-form .form-group {
+  clear: both;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.review-form .rate {
+  display: inline-block;
+  float: none;
+}
+.review-heading {
+  color: #000;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 24px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.review-form .form-control {
+  font-size: 14px;
+}
+.review-form input.form-control {
+  height: 40px;
+}
+.review-form textarea.form-control {
+  resize: none;
+}
+.review-form .round-black-btn {
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+/*Reseñas de los demas*/
+.reviews-container {
+  margin-top: 20px;
+}
+
+.review {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+
+.review-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.review-author {
+  font-weight: bold;
+}
+
+.review-rating {
+  align-items: center;
+  display: flex;
+}
+
+.review-rating-text {
+  margin-left: 10px;
+}
+
+.review-message {
+  margin-bottom: 10px;
+}
+
+.review-date {
+  color: #888;
+}
+
+/* Estilos para las estrellas */
+.rate {
+  display: inline-block;
+  float: none;
+}
+
+.rate input[type="radio"] {
+  position: absolute;
+  top: -9999px;
+}
+
+.rate label {
+  color: #ccc;
+  cursor: pointer;
+  font-size: 21px;
+  margin-right: 5px;
+}
+
+.rate label:before {
+  content: "\2605";
+}
+
+.rate input[type="radio"]:checked ~ label {
+  color: #ffc700;
+}
+
+.rate label:hover,
+.rate label:hover ~ label {
+  color: #deb217;
+}
+
+/*Reseñas Estrella*/
+.rate {
+  float: left;
+  padding: 0 10px 0 0;
+}
+.rate:not(:checked) > input {
+  position: absolute;
+  top: -9999px;
+}
+.rate:not(:checked) > label {
+  color: #ccc;
+  cursor: pointer;
+  float: right;
+  font-size: 21px;
+  line-height: 21px;
+  margin-bottom: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 15px;
+}
+.rate:not(:checked) > label:before {
+  content: "\2605";
+}
+.rate > input:checked ~ label {
+  color: #ffc700;
+}
+
+.rate:not(:checked) > label:hover,
+.rate:not(:checked) > label:hover ~ label {
+  color: #deb217;
+}
+
+.rate > input:checked + label:hover,
+.rate > input:checked + label:hover ~ label,
+.rate > input:checked ~ label:hover,
+.rate > input:checked ~ label:hover ~ label,
+.rate > label:hover ~ input:checked ~ label,
+.rate > input:checked:focus ~ label {
+  color: #c59b08;
+}
+
+/* Breadcrumb Styles */
+.breadcrumb {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  padding: 8px 15px;
+}
+
+.breadcrumb-item {
+  display: inline-block;
+  font-size: 14px;
+}
+
+.breadcrumb-item:not(:last-child):after {
+  content: "/";
+  margin: 0 5px;
+}
+
+.breadcrumb-item a,
+.breadcrumb-item.active {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  font-weight: bold;
+}
+
+.product-image {
+  display: block;
+  margin: 0 auto;
+  max-height: 500px;
+  max-width: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-image {
+  cursor: pointer;
+  height: 80px;
+  margin: 5px;
+  object-fit: cover;
+  width: 80px;
+}
+
+.thumbs-wrapper {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel-item {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: black;
+  background-size: 100%, 100%;
+}
+
+.round-black-btn {
+  background-color: black;
+  border: none;
+  border-radius: 25px;
+  color: white;
+  padding: 10px 20px;
+}
+
+.qty-controls {
+  align-items: center;
+  display: flex;
+}
+
+.qtyminus,
+.qtyplus {
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.qty {
+  margin: 0 10px;
+  text-align: center;
+  width: 50px;
+}
+
+.original-price {
+  color: red;
+  text-decoration: line-through;
+}
+
+.discounted-price {
+  color: green;
+  font-weight: bold;
+}

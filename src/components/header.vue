@@ -1,111 +1,47 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <router-link to="/" class="navbar-brand">DejotaPrint</router-link>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <router-link to="/" class="nav-link">Inicio</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/blog" class="nav-link">Blog</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/productos" class="nav-link"
-              >Productos</router-link
-            >
-          </li>
-          <li class="nav-item">
-            <router-link to="/servicios" class="nav-link"
-              >Servicios</router-link
-            >
-          </li>
-          <li class="nav-item">
-            <router-link to="/quien-somos" class="nav-link"
-              >Quién Somos</router-link
-            >
-          </li>
-          <li class="nav-item">
-            <router-link to="/contacto" class="nav-link">Contacto</router-link>
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#offcanvasRight"
-              aria-controls="offcanvasRight"
-            >
-              <i class="fas fa-shopping-cart me-1"></i>
-            </a>
-          </li>
-        </ul>
+  <header class="header">
+    <nav class="navbar">
+      <div class="logo">
+        <a href="/"><img src="../assets/img/logo.png" alt="MiLogo" /></a>
       </div>
-    </div>
-  </nav>
-
-  <div
-    class="offcanvas offcanvas-end"
-    tabindex="-1"
-    id="offcanvasRight"
-    aria-labelledby="offcanvasRightLabel"
-  >
-    <div class="offcanvas-header bg-dark text-white">
-      <h5 class="offcanvas-title" id="offcanvasRightLabel">Carro de Compra</h5>
-      <button
-        type="button"
-        class="btn-close btn-close-white"
-        data-bs-dismiss="offcanvas"
-        aria-label="Close"
-      ></button>
-    </div>
-    <div class="offcanvas-body">
-      <ul class="list-group">
-        <!-- Aquí puedes agregar los elementos del carro de compra -->
-        <li
-          class="list-group-item d-flex justify-content-between align-items-center"
-        >
-          Producto 1
-          <span class="badge bg-primary rounded-pill">2</span>
+      <ul :class="['nav-links', { active: menuOpen }]">
+        <li class="nav-item">
+          <router-link to="/">Inicio</router-link>
         </li>
-        <li
-          class="list-group-item d-flex justify-content-between align-items-center"
-        >
-          Producto 2
-          <span class="badge bg-primary rounded-pill">1</span>
+        <li class="nav-item">
+          <router-link to="/productos">Productos</router-link>
         </li>
-        <!-- Puedes agregar más productos según sea necesario -->
+        <li class="nav-item">
+          <router-link to="/quienes-somos">Sobre Nosotros</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/contacto">Contacto</router-link>
+        </li>
       </ul>
-      <div class="fondo-carro">
-        <div class="mt-3">
-          <p class="fw-bold">Total:</p>
-          <p>$150.00</p>
-        </div>
-        <div class="d-grid gap-2">
-          <button class="btn btn-primary" type="button">Pagar</button>
-          <button class="btn btn-outline-danger" type="button">
-            Vaciar Carro
-          </button>
-        </div>
+      <div class="menu-icon" @click="toggleMenu">
+        <i :class="menuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
       </div>
-    </div>
-  </div>
-
+    </nav>
+  </header>
   <router-view />
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      menuOpen: false,
+    };
+  },
+  methods: {
+    toggleMenu() {
+      this.menuOpen = !this.menuOpen;
+    },
+    closeMenu() {
+      this.menuOpen = false;
+    },
+  },
+};
 </script>
 
 <style>

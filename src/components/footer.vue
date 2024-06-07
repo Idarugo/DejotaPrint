@@ -19,7 +19,9 @@
           <ul class="footer-links">
             <li><a href="#productos">Productos</a></li>
             <li><a href="#servicios">Servicios</a></li>
-            <li><a href="#contacto">Contacto</a></li>
+            <li>
+              <router-link to="/login" class="nav-link">Login</router-link>
+            </li>
             <!-- Puedes agregar más categorías según tus necesidades -->
           </ul>
         </div>
@@ -28,11 +30,11 @@
           <h6>Enlaces Rápidos</h6>
           <ul class="footer-links">
             <li>
-              <router-link to="/blog" class="nav-link">Blog</router-link>
+              <router-link to="/galeria" class="nav-link">Galeria</router-link>
             </li>
             <li>
-              <router-link to="/servicios" class="nav-link"
-                >Servicios</router-link
+              <router-link to="/preguntas-frecuentes" class="nav-link"
+                >Preguntas Frecuentes</router-link
               >
             </li>
             <li>

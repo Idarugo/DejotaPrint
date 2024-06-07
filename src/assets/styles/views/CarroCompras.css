@@ -1,0 +1,64 @@
+/* Agregamos estilos para el footer vacío */
+.empty-footer {
+  height: 100px; /* Altura suficiente para empujar el contenido hacia abajo */
+}
+
+/* Estilos mejorados para el carro de compras */
+.carro-compras {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Añadimos un margen inferior para separarlo del footer */
+  padding: 20px;
+}
+
+.productos-lista {
+  margin-top: 20px;
+}
+
+.producto {
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.producto-info {
+  flex: 1;
+}
+
+.producto-nombre {
+  font-weight: bold;
+}
+
+.btn-eliminar {
+  background-color: #ff6b6b;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.btn-pagar,
+.btn-vaciar,
+.btn-continuar {
+  background-color: #4caf50;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+.btn-continuar {
+  margin-top: 10px;
+}
+
+.mensaje-vacio {
+  color: #888;
+  font-style: italic;
+}
