@@ -14,12 +14,12 @@
           <th>Acciones</th>
         </tr>
         <!-- Filas de la tabla -->
-        <tr v-for="trabajador in trabajadors" :key="trabajador.rut">
+        <tr v-for="trabajador in paginatedData" :key="trabajador.rut">
           <td>{{ trabajador.rut }}</td>
           <td>{{ trabajador.nombre }}</td>
           <td>{{ trabajador.apellido }}</td>
           <td>{{ trabajador.correo }}</td>
-          <td>{{ trabajador.posicions }}</td>
+          <td>{{ trabajador.posicion }}</td>
           <td>{{ estadoTrabajador(trabajador.estado) }}</td>
           <td>
             <!-- Botón para ver detalles -->
@@ -50,10 +50,16 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="trabajadors.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <!-- Botón para abrir el modal de agregar trabajador -->
       <button
         @click="resetModal"
-        class="btn btn-primary"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
@@ -165,7 +171,7 @@
                   />
                 </div>
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-success">Agregar</button>
+                  <button type="submit" class="btn btn-agregar">Agregar</button>
                   <button
                     type="button"
                     class="btn btn-secondary"
@@ -243,8 +249,11 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
+import Pagination from "../../../components/Pagination.vue";
+import { Modal } from "bootstrap";
 
 export default {
+  components: { Pagination },
   name: "trabajadorAdmin",
   data() {
     return {
@@ -261,13 +270,32 @@ export default {
         estado: 1,
         password: "",
       },
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchTrabajadores();
     this.fetchPosiciones();
   },
+  watch: {
+    trabajadors() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.trabajadors.slice(start, end);
+    },
     fetchTrabajadores() {
       axios
         .get("/api/trabajadores")
@@ -325,6 +353,7 @@ export default {
           );
           if (index !== -1) {
             this.trabajadors.splice(index, 1);
+            this.paginatedData = this.getPaginatedData();
             Swal.fire(
               "Eliminado",
               "El trabajador ha sido eliminado.",
@@ -353,6 +382,9 @@ export default {
         estado: 1,
         password: "",
       };
+      const modalElement = document.getElementById("modalAgregar");
+      const modal = Modal.getOrCreateInstance(modalElement);
+      modal.hide();
     },
     agregarTrabajador() {
       axios
@@ -369,6 +401,13 @@ export default {
             title: "Éxito",
             text: "Trabajador agregado exitosamente",
           });
+
+          // Elimina manualmente el backdrop
+          document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+            backdrop.parentNode.removeChild(backdrop);
+          });
+          document.body.classList.remove("modal-open");
+          document.body.style.paddingRight = "";
         })
         .catch((error) => {
           console.error("Error al agregar el trabajador:", error);

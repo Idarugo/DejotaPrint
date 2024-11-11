@@ -3,9 +3,11 @@ import AdminApp from "@/admin/components/AdminPage.vue";
 import adminRouter from "./router/admin.router";
 import store from "./store";
 
-// Importa Bootstrap CSS y JS
-import "bootstrap";
+// Importa Bootstrap CSS primero
 import "bootstrap/dist/css/bootstrap.min.css";
+
+// Importa Bootstrap JavaScript y jQuery
+import "bootstrap";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import "@fortawesome/fontawesome-free/css/all.css";

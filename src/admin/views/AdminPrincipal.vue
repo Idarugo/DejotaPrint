@@ -77,7 +77,7 @@
                 <p>Fecha: {{ order.fecha }}</p>
                 <p>Método de Envío: {{ order.metodo_envio }}</p>
                 <p>Método de Pago: {{ order.metodo_pago }}</p>
-                <p>Total: {{ order.total }}</p>
+                <p>Total: {{ precioChileno(order.total) }}</p>
               </li>
             </ul>
           </div>
@@ -114,6 +114,13 @@ export default {
   mounted() {
     this.fetchData();
     this.setAutoRefresh();
+  },
+  computed: {
+    precioChileno() {
+      return (precio) => {
+        return "$" + precio.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      };
+    },
   },
   methods: {
     async fetchData() {

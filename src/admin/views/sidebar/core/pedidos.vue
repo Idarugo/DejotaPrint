@@ -9,14 +9,18 @@
           <th>Fecha</th>
           <th>Método de Envío</th>
           <th>Total</th>
+          <th>Descuento Aplicado</th>
+          <!-- Nueva columna -->
           <th>Acciones</th>
         </tr>
         <!-- Filas de la tabla -->
-        <tr v-for="pedido in pedidos" :key="pedido.id">
+        <tr v-for="pedido in paginatedData" :key="pedido.id">
           <td>{{ pedido.id }}</td>
           <td>{{ new Date(pedido.fecha).toLocaleDateString() }}</td>
           <td>{{ pedido.metodo_envio }}</td>
           <td>{{ precioChileno(pedido.total) }}</td>
+          <td>{{ precioChileno(pedido.descuentoAplicado) }}</td>
+          <!-- Mostrar el descuento aplicado -->
           <td>
             <!-- Botón para ver detalles -->
             <button
@@ -37,6 +41,12 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="pedidos.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
 
       <!-- Modal para ver detalles del pedido -->
       <div
@@ -84,6 +94,10 @@
                         <p>
                           <strong>Total:</strong>
                           {{ precioChileno(pedidoActual.total) }}
+                        </p>
+                        <p>
+                          <strong>Descuento Aplicado:</strong>
+                          {{ precioChileno(pedidoActual.descuentoAplicado) }}
                         </p>
                         <ul>
                           <li
@@ -166,23 +180,44 @@
     </div>
   </main>
 </template>
-  
-  <script>
+
+<script>
 import axios from "axios";
 import Swal from "sweetalert2";
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
+  components: { Pagination },
   name: "pedidoAdmin",
   data() {
     return {
       pedidos: [],
       pedidoActual: null,
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchPedidos();
   },
+  watch: {
+    pedidos() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.pedidos.slice(start, end);
+    },
     fetchPedidos() {
       axios
         .get("/api/pedidos")
@@ -238,6 +273,7 @@ export default {
           );
           if (index !== -1) {
             this.pedidos.splice(index, 1);
+            this.paginatedData = this.getPaginatedData();
             Swal.fire("Eliminado", "El pedido ha sido eliminado.", "success");
           }
         })
@@ -256,8 +292,8 @@ export default {
   },
 };
 </script>
-  
-  <style scoped>
+
+<style scoped>
 @import "../../../assets/styles/views/sidebar/core/pedidos.css";
 
 .modal-lg {
@@ -301,4 +337,3 @@ export default {
   }
 }
 </style>
-  

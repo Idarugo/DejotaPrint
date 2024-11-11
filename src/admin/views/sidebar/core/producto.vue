@@ -2,23 +2,22 @@
   <main>
     <div class="container">
       <h1>Administrar productos</h1>
-      <table>
-        <!-- Encabezados de la tabla -->
+      <table class="table table-striped">
         <tr>
           <th>Nombre</th>
-          <th>Descripcion</th>
+          <th>Descripción</th>
           <th>Precio</th>
           <th>Cantidad</th>
+          <th>Estado</th>
           <th>Acciones</th>
         </tr>
-        <!-- Filas de la tabla -->
-        <tr v-for="producto in productos" :key="producto.id">
+        <tr v-for="producto in paginatedData" :key="producto.id">
           <td>{{ producto.nombre }}</td>
           <td>{{ producto.descripcion }}</td>
           <td>{{ precioChileno(producto.precio) }}</td>
           <td>{{ producto.cantidad }}</td>
+          <td>{{ estadoProducto(producto.estado) }}</td>
           <td>
-            <!-- Botón para ver detalles -->
             <button
               @click="verDetalles(producto)"
               class="btn btn-sm btn-info"
@@ -27,7 +26,6 @@
             >
               Ver Detalles
             </button>
-            <!-- Botón para modificar -->
             <button
               @click="prepararModificacion(producto)"
               class="btn btn-sm btn-warning"
@@ -36,7 +34,6 @@
             >
               Modificar
             </button>
-            <!-- Botón para eliminar -->
             <button
               @click="confirmarEliminar(producto.id)"
               class="btn btn-sm btn-danger"
@@ -46,14 +43,21 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="productos.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <button
         @click="resetModal"
-        class="btn btn-primary"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
         Agregar Producto
       </button>
+
       <!-- Modal para agregar nuevos elementos -->
       <div
         class="modal fade"
@@ -76,7 +80,6 @@
               ></button>
             </div>
             <div class="modal-body">
-              <!-- Formulario para agregar nuevos elementos -->
               <form @submit.prevent="agregarProducto">
                 <div class="form-group">
                   <label for="title">Nombre:</label>
@@ -89,7 +92,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label for="content">Descripcion:</label>
+                  <label for="content">Descripción:</label>
                   <textarea
                     class="form-control"
                     id="content"
@@ -97,7 +100,6 @@
                     required
                   ></textarea>
                 </div>
-
                 <div class="form-group">
                   <label for="productoId" class="form-label"
                     >Tipo de producto:</label
@@ -140,14 +142,45 @@
                     required
                   />
                 </div>
+                <div class="form-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="iva"
+                    v-model="nuevoProducto.iva"
+                    hidden
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Este producto es personalizado?</label>
+                  <div>
+                    <input
+                      type="radio"
+                      id="personalizadoSi"
+                      value="1"
+                      v-model="nuevoProducto.es_personalizado"
+                    />
+                    <label for="personalizadoSi">Sí</label>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      id="personalizadoNo"
+                      value="0"
+                      v-model="nuevoProducto.es_personalizado"
+                    />
+                    <label for="personalizadoNo">No</label>
+                  </div>
+                </div>
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary">Agregar</button>
+                  <button type="submit" class="btn btn-agregar">Agregar</button>
                 </div>
               </form>
             </div>
           </div>
         </div>
       </div>
+
       <!-- Modal para modificar producto -->
       <div
         class="modal fade"
@@ -171,7 +204,6 @@
               ></button>
             </div>
             <div class="modal-body">
-              <!-- Formulario para modificar producto -->
               <form v-if="productoActual" @submit.prevent="modificarProducto">
                 <div class="form-group">
                   <label for="titleModificar">Nombre:</label>
@@ -184,7 +216,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label for="contentModificar">Descripcion:</label>
+                  <label for="contentModificar">Descripción:</label>
                   <textarea
                     class="form-control"
                     id="contentModificar"
@@ -192,7 +224,6 @@
                     required
                   ></textarea>
                 </div>
-
                 <div class="form-group">
                   <label for="productoIdModificar" class="form-label"
                     >Tipo de producto:</label
@@ -235,6 +266,35 @@
                     required
                   />
                 </div>
+                <div class="form-group">
+                  <label for="ivaModificar">IVA:</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="ivaModificar"
+                    v-model="productoActual.iva"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>¿Este producto es personalizado?</label>
+                  <div>
+                    <input
+                      type="radio"
+                      id="personalizado_si_modificar"
+                      value="1"
+                      v-model="productoActual.es_personalizado"
+                    />
+                    <label for="personalizado_si_modificar">Sí</label>
+                    <input
+                      type="radio"
+                      id="personalizado_no_modificar"
+                      value="0"
+                      v-model="productoActual.es_personalizado"
+                    />
+                    <label for="personalizado_no_modificar">No</label>
+                  </div>
+                </div>
                 <div class="modal-footer">
                   <button type="submit" class="btn btn-primary">
                     Guardar cambios
@@ -248,6 +308,7 @@
           </div>
         </div>
       </div>
+
       <!-- Modal para ver detalles del producto -->
       <div
         class="modal fade"
@@ -270,11 +331,10 @@
               ></button>
             </div>
             <div class="modal-body">
-              <!-- Contenido del modal -->
               <template v-if="productoActual">
                 <p><strong>Nombre:</strong> {{ productoActual.nombre }}</p>
                 <p>
-                  <strong>Descripcion:</strong>
+                  <strong>Descripción:</strong>
                   {{ productoActual.descripcion }}
                 </p>
                 <p>
@@ -292,6 +352,10 @@
                 <p>
                   <strong>Cantidad:</strong>
                   {{ productoActual.cantidad }}
+                </p>
+                <p>
+                  <strong>Personalizado:</strong>
+                  {{ productoActual.es_personalizado ? "Sí" : "No" }}
                 </p>
               </template>
               <template v-else>
@@ -318,25 +382,41 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Modal } from "bootstrap";
+import Pagination from "../../../components/Pagination.vue"; // Asegúrate de la ruta correcta del componente
 
 export default {
+  components: { Pagination },
   data() {
     return {
       productos: [],
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
       subcategorias: [],
-      productoActual: null, // Almacena el producto actual para ver detalles o modificar
+      productoActual: null,
       nuevoProducto: {
         nombre: "",
         descripcion: "",
         subcategoria: "",
         precio: 0,
         cantidad: 0,
+        estado: 0,
+        iva: 19.0, // Valor predeterminado para el IVA
+        es_personalizado: 0, // Valor predeterminado para personalizado
       },
     };
   },
   created() {
     this.fetchproductos();
     this.fetchsubcategorias();
+  },
+  watch: {
+    productos() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
   },
   computed: {
     precioChileno() {
@@ -350,9 +430,26 @@ export default {
     },
   },
   methods: {
+    estadoProducto(estado) {
+      return estado === 1 ? "Personalizado" : "Publico";
+    },
+    onPageChange(page) {
+      this.currentPage = page;
+      this.paginatedData = this.getPaginatedData();
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.productos.slice(start, end);
+    },
     fetchproductos() {
+      const token = localStorage.getItem("token");
       axios
-        .get("/api/productos")
+        .get("/api/productos/admin", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
           this.productos = response.data;
         })
@@ -367,9 +464,9 @@ export default {
     },
     fetchsubcategorias() {
       axios
-        .get("/api/subcategorias") // Ruta del endpoint para obtener todos los productos
+        .get("/api/subcategorias")
         .then((response) => {
-          this.subcategorias = response.data; // Almacenamos los productos en la propiedad productos
+          this.subcategorias = response.data;
         })
         .catch((error) => {
           console.error("Error al obtener los tipos de productos:", error);
@@ -381,25 +478,42 @@ export default {
         });
     },
     agregarProducto() {
-      // Envía la solicitud POST para agregar el nuevo producto
+      const token = localStorage.getItem("token");
+
       axios
-        .post("/api/productos", this.nuevoProducto)
+        .post("/api/productos", this.nuevoProducto, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
-          // Crea el nuevo producto con los datos de la respuesta
-          const nuevoProducto = {
-            ...this.nuevoProducto,
-            id: response.data.id,
-          };
-          // Agrega el nuevo producto a la lista localmente
+          const nuevoProducto = { ...this.nuevoProducto, id: response.data.id };
           this.productos.push(nuevoProducto);
-          // Reinicia el formulario y cierra el modal
           this.resetModal();
-          // Muestra un mensaje de éxito
           Swal.fire({
             icon: "success",
             title: "Éxito",
             text: "Producto agregado exitosamente",
           });
+
+          // Actualiza la paginación
+          this.currentPage = Math.ceil(this.productos.length / this.pageSize);
+          this.paginatedData = this.getPaginatedData();
+
+          // Cierra el modal utilizando Bootstrap
+          const modal = Modal.getInstance(
+            document.getElementById("modalAgregar")
+          );
+          if (modal) {
+            modal.hide();
+          }
+
+          // Elimina manualmente el backdrop
+          document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+            backdrop.parentNode.removeChild(backdrop);
+          });
+          document.body.classList.remove("modal-open");
+          document.body.style.paddingRight = "";
         })
         .catch((error) => {
           console.error("Error al agregar el producto:", error);
@@ -410,20 +524,30 @@ export default {
           });
         });
     },
+    resetModal() {
+      this.productoActual = null;
+      // Si no usas Bootstrap para cerrar el modal, agrega este código
+      const modalElement = document.getElementById("modalAgregar");
+      const modal = Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
+      modalElement.addEventListener("hidden.bs.modal", () => {
+        modalElement.remove();
+      });
+    },
     prepararModificacion(producto) {
       this.productoActual = producto;
     },
     modificarProducto() {
+      this.productoActual.estado = 0;
       axios
         .put(`/api/productos/${this.productoActual.id}`, this.productoActual)
         .then(() => {
-          // Cierra el modal de modificación
           const modal = document.getElementById("modalModificar");
-          const bootstrapModal = Modal.getInstance(modal); // Usa el objeto Modal de Bootstrap
+          const bootstrapModal = Modal.getInstance(modal);
           bootstrapModal.hide();
-          // Muestra un mensaje de éxito
           Swal.fire("Modificado", "El producto ha sido modificado.", "success");
-          // Actualiza la lista de productos
           this.fetchproductos();
         })
         .catch((error) => {
@@ -458,12 +582,12 @@ export default {
       axios
         .delete(`/api/productos/${productoId}`)
         .then(() => {
-          // Eliminar el productoo de la lista localmente
           const index = this.productos.findIndex(
             (producto) => producto.id === productoId
           );
           if (index !== -1) {
             this.productos.splice(index, 1);
+            this.paginatedData = this.getPaginatedData();
             Swal.fire("Eliminado", "El producto ha sido eliminado.", "success");
           }
         })
@@ -479,7 +603,7 @@ export default {
     resetModal() {
       this.productoActual = null;
       const modal = document.getElementById("modalAgregar");
-      const bootstrapModal = Modal.getInstance(modal); // Usa el objeto Modal de Bootstrap
+      const bootstrapModal = Modal.getInstance(modal);
       bootstrapModal.hide();
     },
   },

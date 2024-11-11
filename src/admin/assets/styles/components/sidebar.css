@@ -63,10 +63,6 @@ body {
   width: 100%;
 }
 
-main {
-  background-color: var(--body-color);
-}
-
 #cloud-img {
   height: 24px; /* Ajusta el alto según tus necesidades */
   margin-right: 10px; /* Ajusta el margen derecho según tus necesidades */
@@ -92,11 +88,14 @@ main {
 }
 
 /*----------- Modal------------*/
-#modalAgregar .modal-content,
-#myModal .modal-content,
-#modalModificar .modal-content,
-#modalEditar .modal-content,
+#agregar .modal-content,
+#detalleProductoModal .modal-content,
+#detalleBlogModal .modal-content,
+#modalVisualizar .modal-content,
+#tbody_anular .modal-content,
+#modal_modificar .modal-content,
 #modal .modal-content,
+#modal_respuesta .modal-content,
 #eliminar .modal-content {
   background-color: var(--sidebar-color);
   color: var(--text-color);
@@ -132,11 +131,19 @@ main {
 }
 
 .custom-icon {
-  background-image: url("../../img/logo.jpg");
+  background-image: url("../../../assets/img/logo.jpg");
   background-size: 100%;
   border-radius: 50%;
   height: 48px; /* Aumenta el tamaño del contenedor */
   width: 48px; /* Aumenta el tamaño del contenedor */
+}
+
+.listado {
+  padding: 0%;
+}
+
+.otros-submenu {
+  padding: 0%;
 }
 
 /*----------------Barra Lateral*/
@@ -193,6 +200,20 @@ main {
   width: 30px;
 }
 
+ul {
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0px;
+}
+
+.funa {
+  font-size: 0.9em !important;
+}
+
+.largo {
+  font-size: 14px !important;
+}
+
 /*------------> Botón*/
 .barra-lateral .boton {
   align-items: center;
@@ -209,10 +230,6 @@ main {
 .barra-lateral .boton ion-icon {
   font-size: 25px;
   min-width: 50px;
-}
-
-.listado {
-  padding-left: 0%;
 }
 
 /*--------------> Buscar */
@@ -391,7 +408,11 @@ main {
 
 /*-------------main*/
 
-#inbox {
+/* #inbox{
+    background-color: var(--color-menu-hover);
+    color: var(--color-menu-hover-texto);
+} */
+.menu-selected {
   background-color: var(--color-menu-hover);
   color: var(--color-menu-hover-texto);
 }
@@ -403,6 +424,9 @@ main {
 }
 main.min-main {
   margin-left: 80px;
+}
+.headerTelefono {
+  display: none;
 }
 
 /*------------------> Responsive*/
@@ -423,8 +447,16 @@ main.min-main {
     left: 0;
   }
   .menu {
+    align-items: center;
     display: flex;
+    position: fixed;
   }
+
+  .headerTelefono {
+    display: block;
+    font-weight: bold;
+  }
+
   .menu ion-icon:nth-child(2) {
     display: none;
   }

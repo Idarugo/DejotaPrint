@@ -41,7 +41,6 @@
               <img :src="producto.imagen" alt="" />
             </div>
             <h3>{{ producto.nombre }}</h3>
-            <p>{{ producto.descripcion }}</p>
           </div>
         </div>
       </section>
@@ -50,42 +49,42 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
-      productos: [
-        {
-          nombre: "Diseño 1",
-          descripcion: "Lanyard de poliéster con logotipo personalizado.",
-          imagen: "path/to/image1.jpg",
-        },
-        {
-          nombre: "Diseño 2",
-          descripcion: "Llavero de metal con grabado personalizado.",
-          imagen: "path/to/image2.jpg",
-        },
-        {
-          nombre: "Diseño 3",
-          descripcion:
-            "Porta credenciales de cuero con estampado personalizado.",
-          imagen: "path/to/image3.jpg",
-        },
-      ],
+      productos: [],
     };
   },
   methods: {
     solicitarPresupuesto() {
-      // Lógica para solicitar presupuesto
-      console.log("Solicitar Presupuesto");
+      this.$router.push("/contacto");
     },
     verProductos() {
-      // Lógica para ver productos
-      console.log("Ver Productos");
+      this.$router.push("/productos");
     },
+    async fetchDisenos() {
+      try {
+        const response = await axios.get("http://localhost:3000/api/disenos");
+        this.productos = response.data.map((diseno) => ({
+          nombre: diseno.nombre,
+          descripcion: diseno.descripcion,
+          imagen: diseno.imagen
+            ? `http://localhost:3000${diseno.imagen}`
+            : "http://localhost:3000/uploads/disenos/default.jpg",
+        }));
+      } catch (error) {
+        console.error("Error al obtener los diseños:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchDisenos();
   },
 };
 </script>
 
 <style scoped>
-@import "../../assets/styles/views/quienes-somos.css";
+@import "../../assets/styles/views/info/quienes-somos.css";
 </style>

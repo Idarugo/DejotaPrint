@@ -1,21 +1,26 @@
-.container {
+.container-productos {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 20px; /* Ajusta según la altura del header */
+  padding-top: 80px; /* Ajusta según la altura del header */
 }
 
 .filters {
-  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   padding: 10px;
-  width: 20%;
+  width: 100%; /* Cambiar a ancho completo para pantallas pequeñas */
 }
 
 .product-area {
   padding: 10px;
-  width: 80%;
+  width: 100%; /* Cambiar a ancho completo para pantallas pequeñas */
 }
 
 .sort-options-wrapper {
   align-items: center;
   display: flex;
+  flex-direction: column; /* Cambiar a columna para pantallas pequeñas */
   justify-content: space-between;
   margin-bottom: 20px;
 }
@@ -23,6 +28,7 @@
 .sort-options {
   align-items: center;
   display: flex;
+  margin-bottom: 10px; /* Añadir margen inferior para separación */
 }
 
 .sort-options label {
@@ -39,7 +45,7 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 5px 10px;
-  padding-right: 25px; /* space for icon */
+  padding-right: 25px; /* espacio para el icono */
 }
 
 .select-wrapper i {
@@ -53,6 +59,7 @@
 .products {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center; /* Centrar productos en pantallas pequeñas */
 }
 
 .product-card {
@@ -61,7 +68,7 @@
   margin: 10px;
   padding: 10px;
   text-align: left;
-  width: 30%;
+  width: 300px; /* Adjust width according to your design */
 }
 
 .image-placeholder {
@@ -82,11 +89,59 @@
 }
 
 .original-price {
-  color: red;
+  color: #6c757d;
   text-decoration: line-through;
 }
 
 .discounted-price {
-  color: green;
+  color: #212529;
   font-weight: bold;
+}
+
+/* Estilos para los mensajes de no datos */
+.no-datos {
+  color: #666;
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+}
+
+.btn-presupuesto {
+  background-color: #333;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.btn-presupuesto:hover {
+  background-color: #555;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .container {
+    flex-direction: row;
+  }
+
+  .filters {
+    border-bottom: none;
+    border-right: 1px solid #ddd;
+    width: 20%;
+  }
+
+  .product-area {
+    width: 80%;
+  }
+
+  .sort-options-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 992px) {
 }

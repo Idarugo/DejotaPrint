@@ -14,7 +14,7 @@
           <th>Acciones</th>
         </tr>
         <!-- Filas de la tabla -->
-        <tr v-for="reseña in reseñas" :key="reseña.id">
+        <tr v-for="reseña in paginatedData" :key="reseña.id">
           <td>{{ reseña.nombre_producto }}</td>
           <td>{{ reseña.clasificacion }}</td>
           <td>{{ reseña.mensaje }}</td>
@@ -42,6 +42,12 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="reseñas.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <!-- Modal para ver detalles del reseña -->
       <div
         class="modal fade"
@@ -100,20 +106,41 @@
   <script>
 import axios from "axios";
 import Swal from "sweetalert2";
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
+  components: { Pagination },
   name: "reseñaAdmin",
   data() {
     return {
       reseñas: [],
       modalTitle: "Detalles Reseña",
-      reseñaActual: null, // Variable para almacenar el reseña actual
+      reseñaActual: null,
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchReseñas();
   },
+  watch: {
+    reseñas() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.reseñas.slice(start, end);
+    },
     fetchReseñas() {
       axios
         .get("/api/resenas")
@@ -132,7 +159,6 @@ export default {
     verDetalles(reseña) {
       this.reseñaActual = reseña; // Cambio "reseñasActual" a "reseñaActual"
     },
-
     confirmarEliminar(reseñaId) {
       Swal.fire({
         title: "¿Estás seguro?",
@@ -159,6 +185,7 @@ export default {
           );
           if (index !== -1) {
             this.reseñas.splice(index, 1);
+            this.paginatedData = this.getPaginatedData();
             Swal.fire("Eliminado", "Reseña ha sido eliminado.", "success");
           }
         })

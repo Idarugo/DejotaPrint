@@ -1,7 +1,14 @@
 import { createRouter, createWebHistory } from "vue-router";
-import AdminPrincipal from "../views/AdminPrincipal.vue"; // Asegúrate de que esta ruta es correcta
+import AdminPrincipal from "../views/AdminPrincipal.vue";
+import Login from "../index.vue"; // Importa tu componente de login
 
 const adminRoutes = [
+  {
+    path: "/admin/login",
+    name: "admin-login",
+    component: Login,
+    meta: { requiresAuth: false },
+  },
   {
     path: "/admin/principal",
     name: "AdminPrincipal",
@@ -16,6 +23,38 @@ const adminRoutes = [
     component: () => import("../views/sidebar/core/producto.vue"),
     meta: {
       title: "Producto",
+    },
+  },
+  {
+    path: "/admin/descuentos",
+    name: "admin-descuentos",
+    component: () => import("../views/sidebar/core/descuento.vue"),
+    meta: {
+      title: "Producto",
+    },
+  },
+  {
+    path: "/admin/diseno",
+    name: "admin-diseno",
+    component: () => import("../views/sidebar/core/diseno.vue"),
+    meta: {
+      title: "Diseño",
+    },
+  },
+  {
+    path: "/admin/cotizacion",
+    name: "admin-cotizacion",
+    component: () => import("../views/sidebar/core/cotizacion.vue"),
+    meta: {
+      title: "Cotizacion",
+    },
+  },
+  {
+    path: "/admin/personalizado",
+    name: "admin-personalizado",
+    component: () => import("../views/sidebar/core/archivosSubidos.vue"),
+    meta: {
+      title: "Personalizado",
     },
   },
   {
@@ -152,6 +191,15 @@ const adminRoutes = [
 const adminRouter = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes: adminRoutes,
+});
+
+adminRouter.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  if (to.matched.some((record) => record.meta.requiresAuth) && !token) {
+    next({ name: "admin-login" });
+  } else {
+    next();
+  }
 });
 
 export default adminRouter;

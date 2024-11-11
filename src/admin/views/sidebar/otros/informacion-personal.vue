@@ -120,6 +120,8 @@
 
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
+import EventBus from "@/admin/services/eventBus";
 
 export default {
   data() {
@@ -130,13 +132,12 @@ export default {
         apellido: "",
         telefono: "",
         correo: "",
-        cambiarContraseña: "2", // Por defecto, no cambiar contraseña
-        nuevaContraseña: "", // Variable para almacenar la nueva contraseña
+        cambiarContraseña: "2",
+        nuevaContraseña: "",
       },
     };
   },
   mounted() {
-    // Realiza una solicitud GET para obtener los datos del trabajador al cargar el componente
     this.obtenerDatosTrabajador();
   },
   methods: {
@@ -150,49 +151,78 @@ export default {
           return;
         }
 
-        const response = await axios.get(`/api/trabajadores/${workerRut}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `http://localhost:3000/api/trabajadores/${workerRut}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         this.trabajador = response.data;
       } catch (error) {
         console.error("Error al obtener los datos del trabajador:", error);
-        if (error.response) {
-          console.error("Datos del error:", error.response.data);
-          console.error("Estado del error:", error.response.status);
-          console.error("Cabeceras del error:", error.response.headers);
-        }
       }
     },
-
     cambiarContraseña() {
       if (this.trabajador.cambiarContraseña === "1") {
-        // Mostrar el campo de nueva contraseña si se selecciona "Sí"
         document.getElementById("change_pass_container").style.display =
           "block";
       } else {
-        // Ocultar el campo de nueva contraseña si se selecciona "No"
         document.getElementById("change_pass_container").style.display = "none";
-        this.trabajador.nuevaContraseña = ""; // Restablecer la nueva contraseña
+        this.trabajador.nuevaContraseña = "";
       }
     },
     async submitForm() {
       try {
-        // Enviar la solicitud PUT solo si hay un RUT de trabajador definido
+        const token = localStorage.getItem("token");
+
         if (!this.trabajador.rut) {
           console.error("No se ha proporcionado un RUT de trabajador");
           return;
         }
 
+        const updatedFields = {};
+        if (this.trabajador.nombre)
+          updatedFields.nombre = this.trabajador.nombre;
+        if (this.trabajador.apellido)
+          updatedFields.apellido = this.trabajador.apellido;
+        if (this.trabajador.telefono)
+          updatedFields.telefono = this.trabajador.telefono;
+        if (this.trabajador.nuevaContraseña)
+          updatedFields.nuevaContraseña = this.trabajador.nuevaContraseña;
+
         const response = await axios.put(
-          `/api/trabajadores/${this.trabajador.rut}`,
-          this.trabajador
+          `http://localhost:3000/api/trabajadores/${this.trabajador.rut}`,
+          updatedFields,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
+
         console.log(response.data);
+
+        EventBus.emit("trabajador-actualizado", this.trabajador);
+
+        Swal.fire({
+          icon: "success",
+          title: "Actualización exitosa",
+          text: "La información personal ha sido actualizada correctamente.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } catch (error) {
         console.error("Error al enviar el formulario:", error);
+
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un problema al actualizar la información. Por favor, intenta de nuevo.",
+          showConfirmButton: true,
+        });
       }
     },
   },

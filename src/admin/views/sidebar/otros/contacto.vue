@@ -12,7 +12,7 @@
           <th>Acciones</th>
         </tr>
         <!-- Filas de la tabla -->
-        <tr v-for="contact in contacts" :key="contact.id">
+        <tr v-for="contact in paginatedData" :key="contact.id">
           <td>{{ contact.nombre }}</td>
           <td>{{ contact.correo }}</td>
           <td>{{ contact.mensaje }}</td>
@@ -37,6 +37,12 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="contacts.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <!-- Modal para ver detalles del contacto -->
       <div
         class="modal fade"
@@ -95,20 +101,41 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
+  components: { Pagination },
   name: "contactoAdmin",
   data() {
     return {
       contacts: [],
       modalTitle: "Detalles del Contacto",
-      contactoActual: null, // Variable para almacenar el contacto actual
+      contactoActual: null,
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchContactos();
   },
+  watch: {
+    contacts() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.contacts.slice(start, end);
+    },
     fetchContactos() {
       axios
         .get("/api/contactos")
@@ -154,6 +181,7 @@ export default {
           );
           if (index !== -1) {
             this.contacts.splice(index, 1);
+            this.paginatedData = this.getPaginatedData();
             Swal.fire("Eliminado", "El contacto ha sido eliminado.", "success");
           }
         })

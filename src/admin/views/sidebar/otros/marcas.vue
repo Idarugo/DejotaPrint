@@ -9,7 +9,7 @@
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
-        <tr v-for="marca in marcas" :key="marca.id">
+        <tr v-for="marca in paginatedData" :key="marca.id">
           <td>{{ marca.nombre }}</td>
           <td>
             <img
@@ -43,9 +43,15 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="marcas.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <button
         type="button"
-        class="btn btn-primary mb-3"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
@@ -94,7 +100,7 @@
                   />
                 </div>
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary">Agregar</button>
+                  <button type="submit" class="btn btn-agregar">Agregar</button>
                 </div>
               </form>
             </div>
@@ -160,7 +166,7 @@
               </button>
               <button
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-agregar"
                 @click="actualizarMarca"
               >
                 Guardar cambios
@@ -176,9 +182,11 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
-import { Modal } from "bootstrap";
+import * as bootstrap from "bootstrap"; // Importamos bootstrap aquí
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
+  components: { Pagination },
   name: "marcaAdmin",
   data() {
     return {
@@ -189,12 +197,31 @@ export default {
         imagen: null,
         estado: 1,
       },
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchMarcas();
   },
+  watch: {
+    marcas() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.marcas.slice(start, end);
+    },
     fetchMarcas() {
       axios
         .get("/api/marcas")
@@ -216,10 +243,23 @@ export default {
         this[target].imagen = file;
       }
     },
+    cerrarModal(idModal) {
+      const modal = document.getElementById(idModal);
+      const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
+
+      // Eliminar backdrop residual
+      const backdrops = document.querySelectorAll(".modal-backdrop");
+      backdrops.forEach((backdrop) => backdrop.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
+    },
     agregarMarca() {
       const formData = new FormData();
       formData.append("nombre", this.nuevaMarca.nombre);
-      formData.append("imagen", this.nuevaMarca.imagen); // Aquí debe ser un archivo, no una URL
+      formData.append("imagen", this.nuevaMarca.imagen);
       formData.append("estado", this.nuevaMarca.estado);
 
       axios
@@ -235,9 +275,7 @@ export default {
             imagen: null,
             estado: 1,
           };
-          const modal = document.getElementById("modalAgregar");
-          const bootstrapModal = Modal.getOrCreateInstance(modal);
-          bootstrapModal.hide();
+          this.cerrarModal("modalAgregar");
           Swal.fire({
             icon: "success",
             title: "Éxito",
@@ -268,9 +306,7 @@ export default {
         .put(`/api/marcas/${this.marcaActual.id}`, formData)
         .then(() => {
           this.fetchMarcas();
-          const modal = document.getElementById("myModal");
-          const bootstrapModal = Modal.getOrCreateInstance(modal);
-          bootstrapModal.hide();
+          this.cerrarModal("myModal");
           Swal.fire({
             icon: "success",
             title: "Éxito",
@@ -307,11 +343,7 @@ export default {
         .delete(`/api/marcas/${marcaId}`)
         .then(() => {
           this.fetchMarcas();
-          Swal.fire({
-            icon: "success",
-            title: "Eliminado",
-            text: "La marca ha sido eliminada.",
-          });
+          Swal.fire("Eliminado", "La marca ha sido eliminada.", "success");
         })
         .catch((error) => {
           console.error("Error al eliminar la marca:", error);
@@ -344,9 +376,6 @@ export default {
     },
     estadoMarca(estado) {
       return estado === 1 ? "Habilitado" : "Deshabilitado";
-    },
-    getImagenUrl(imagenPath) {
-      return `${window.location.origin}/${imagenPath}`;
     },
   },
 };

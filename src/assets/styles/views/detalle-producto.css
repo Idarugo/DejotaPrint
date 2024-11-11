@@ -369,6 +369,10 @@
   justify-content: center;
 }
 
+.carousel-item img {
+  margin: 0 auto; /* Centra la imagen dentro del carrusel */
+}
+
 .carousel-control-prev,
 .carousel-control-next {
   width: 5%;
@@ -378,41 +382,4 @@
 .carousel-control-next-icon {
   background-color: black;
   background-size: 100%, 100%;
-}
-
-.round-black-btn {
-  background-color: black;
-  border: none;
-  border-radius: 25px;
-  color: white;
-  padding: 10px 20px;
-}
-
-.qty-controls {
-  align-items: center;
-  display: flex;
-}
-
-.qtyminus,
-.qtyplus {
-  background-color: black;
-  color: white;
-  cursor: pointer;
-  padding: 5px 10px;
-}
-
-.qty {
-  margin: 0 10px;
-  text-align: center;
-  width: 50px;
-}
-
-.original-price {
-  color: red;
-  text-decoration: line-through;
-}
-
-.discounted-price {
-  color: green;
-  font-weight: bold;
 }

@@ -13,7 +13,7 @@
           <th>Acciones</th>
         </tr>
         <!-- Filas de la tabla -->
-        <tr v-for="oferta in ofertas" :key="oferta.id">
+        <tr v-for="oferta in paginatedData" :key="oferta.id">
           <td>{{ oferta.nombre_producto }}</td>
           <td>{{ precioChileno(oferta.precio_descuento) }}</td>
           <td>{{ new Date(oferta.fecha_inicio).toLocaleDateString() }}</td>
@@ -46,10 +46,16 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="ofertas.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <!-- Botón para agregar oferta -->
       <button
         type="button"
-        class="btn btn-primary mb-3"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
@@ -146,7 +152,8 @@
           </div>
         </div>
       </div>
-      <!-- Modal para ver detalles del ofertao -->
+
+      <!-- Modal para ver detalles del oferta -->
       <div
         class="modal fade"
         id="myModal"
@@ -158,7 +165,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel">
-                Detalles del ofertao
+                Detalles del oferta
               </h5>
               <button
                 type="button"
@@ -205,18 +212,20 @@
     </div>
   </main>
 </template>
-  
-  <script>
+
+<script>
 import axios from "axios";
 import Swal from "sweetalert2";
-import $ from "jquery";
+import Pagination from "../../../components/Pagination.vue";
+import { Modal } from "bootstrap"; // Asegúrate de importar Bootstrap Modal
 
 export default {
+  components: { Pagination },
   name: "ofertaAdmin",
   data() {
     return {
       ofertas: [],
-      modalTitle: "Detalles del oferta",
+      productos: [], // Asegúrate de definir la propiedad productos
       ofertaActual: null,
       createOferta: {
         producto_id: "",
@@ -225,6 +234,9 @@ export default {
         fecha_fin: "",
         estado: 1,
       },
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
 
@@ -232,7 +244,23 @@ export default {
     this.fetchofertas();
     this.fetchProductos();
   },
+  watch: {
+    ofertas() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.ofertas.slice(start, end);
+    },
     fetchofertas() {
       axios
         .get("/api/ofertas")
@@ -240,11 +268,11 @@ export default {
           this.ofertas = response.data;
         })
         .catch((error) => {
-          console.error("Error al obtener los ofertas:", error);
+          console.error("Error al obtener las ofertas:", error);
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Error al obtener los ofertas. Por favor, intenta de nuevo más tarde.",
+            text: "Error al obtener las ofertas. Por favor, intenta de nuevo más tarde.",
           });
         });
     },
@@ -283,7 +311,7 @@ export default {
       // Enviar solicitud al servidor para agregar la oferta
       axios
         .post("/api/ofertas", this.createOferta)
-        .then(() => {
+        .then((response) => {
           // Limpiar el formulario
           this.createOferta = {
             producto_id: "",
@@ -292,10 +320,26 @@ export default {
             fecha_fin: "",
             estado: 1,
           };
-          // Cerrar el modal
-          $("#modalAgregar").modal("hide");
+
+          // Cierra el modal utilizando Bootstrap
+          const modalElement = document.getElementById("modalAgregar");
+          if (modalElement) {
+            const modal = Modal.getInstance(modalElement);
+            if (modal) {
+              modal.hide();
+            }
+          }
+
+          // Elimina manualmente el backdrop
+          document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+            backdrop.parentNode.removeChild(backdrop);
+          });
+          document.body.classList.remove("modal-open");
+          document.body.style.paddingRight = "";
+
           // Actualizar la lista de ofertas
           this.fetchofertas();
+
           // Mostrar mensaje de éxito
           Swal.fire(
             "Oferta agregada",
@@ -337,27 +381,27 @@ export default {
       axios
         .delete(`/api/ofertas/${ofertaId}`)
         .then(() => {
-          // Eliminar el oferta de la lista localmente
+          // Eliminar la oferta de la lista localmente
           const index = this.ofertas.findIndex(
             (oferta) => oferta.id === ofertaId
           );
           if (index !== -1) {
             this.ofertas.splice(index, 1);
-            Swal.fire("Eliminado", "El oferta ha sido eliminado.", "success");
+
+            // Actualizar la paginación
+            this.paginatedData = this.getPaginatedData();
+
+            Swal.fire("Eliminado", "La oferta ha sido eliminada.", "success");
           }
         })
         .catch((error) => {
-          console.error("Error al eliminar el oferta:", error);
+          console.error("Error al eliminar la oferta:", error);
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Error al eliminar el oferta. Por favor, intenta de nuevo más tarde.",
+            text: "Error al eliminar la oferta. Por favor, intenta de nuevo más tarde.",
           });
         });
-    },
-    resetModal() {
-      this.ofertaActual = null;
-      this.$refs.myModalRef.hide();
     },
     estadoOferta(estado) {
       return estado === 1 ? "Habilitado" : "Deshabilitado";
@@ -366,23 +410,23 @@ export default {
       axios
         .put(`/api/ofertas/${ofertaId}/estado`, { estado: nuevoEstado })
         .then(() => {
-          // Actualizar el estado del oferta localmente
+          // Actualizar el estado de la oferta localmente
           const oferta = this.ofertas.find((t) => t.id === ofertaId);
           if (oferta) {
             oferta.estado = nuevoEstado;
           }
           Swal.fire(
             "Estado actualizado",
-            "El estado del oferta ha sido actualizado correctamente.",
+            "El estado de la oferta ha sido actualizado correctamente.",
             "success"
           );
         })
         .catch((error) => {
-          console.error("Error al actualizar el estado del oferta:", error);
+          console.error("Error al actualizar el estado de la oferta:", error);
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Error al actualizar el estado del oferta. Por favor, intenta de nuevo más tarde.",
+            text: "Error al actualizar el estado de la oferta. Por favor, intenta de nuevo más tarde.",
           });
         });
     },
@@ -396,10 +440,8 @@ export default {
   },
 };
 </script>
-  
-  
+
 <style scoped>
 @import "../../../assets/styles/components/sidebar.css";
 @import "../../../assets/styles/views/sidebar/core/oferta.css";
 </style>
-  

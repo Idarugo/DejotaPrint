@@ -18,7 +18,7 @@
             <!-- Botón para modificar -->
             <button
               @click="verDetalles(horario)"
-              class="btn btn-sm btn-info"
+              class="btn btn-modificar"
               data-bs-toggle="modal"
               data-bs-target="#myModal"
             >
@@ -83,7 +83,7 @@
               </button>
               <button
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-modificar"
                 @click="actualizarHorario"
               >
                 Guardar cambios
@@ -145,6 +145,22 @@ export default {
             title: "Éxito",
             text: "Horario actualizado correctamente",
           });
+
+          // Cierra el modal utilizando Bootstrap
+          const modalElement = document.getElementById("myModal");
+          if (modalElement) {
+            const modal = Modal.getInstance(modalElement);
+            if (modal) {
+              modal.hide();
+            }
+          }
+
+          // Elimina manualmente el backdrop
+          document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+            backdrop.parentNode.removeChild(backdrop);
+          });
+          document.body.classList.remove("modal-open");
+          document.body.style.paddingRight = "";
         })
         .catch((error) => {
           console.error("Error al actualizar el horario:", error);
@@ -168,4 +184,3 @@ export default {
 <style scoped>
 @import "../../../assets/styles/views/sidebar/otros/horario.css";
 </style>
- 

@@ -1,10 +1,8 @@
 <template>
   <main>
     <div class="container">
-      <h1>Administrar Plantilla</h1>
-
+      <h1>Administrar Plantillas</h1>
       <table>
-        <!-- Encabezados de la tabla -->
         <tr>
           <th>Nombre</th>
           <th>Descripción</th>
@@ -13,15 +11,13 @@
           <th>Etiquetas</th>
           <th>Acciones</th>
         </tr>
-        <!-- Filas de la tabla -->
-        <tr v-for="plantilla in plantillas" :key="plantilla.id">
+        <tr v-for="plantilla in paginatedData" :key="plantilla.id">
           <td>{{ plantilla.nombre }}</td>
           <td>{{ plantilla.descripcion }}</td>
           <td>{{ plantilla.tipo }}</td>
           <td>{{ plantilla.ruta_archivo }}</td>
           <td>{{ plantilla.etiquetas }}</td>
           <td>
-            <!-- Botón para modificar -->
             <button
               @click="prepararModificacion(plantilla)"
               class="btn btn-sm btn-warning"
@@ -30,24 +26,37 @@
             >
               Modificar
             </button>
-            <!-- Botón para eliminar -->
             <button
               @click="confirmarEliminar(plantilla.id)"
               class="btn btn-sm btn-danger"
             >
               Eliminar
             </button>
+            <a
+              :href="`http://localhost:3000${plantilla.ruta_archivo}`"
+              download
+              class="btn btn-sm btn-primary"
+            >
+              Descargar
+            </a>
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="plantillas.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <button
         @click="prepararAgregar"
-        class="btn btn-primary mb-3"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
         Agregar Plantilla
       </button>
+
       <!-- Modal para agregar plantilla -->
       <div
         class="modal fade"
@@ -70,8 +79,6 @@
               ></button>
             </div>
             <div class="modal-body">
-              <!-- Formulario para agregar plantilla -->
-              <!-- Formulario para agregar plantilla -->
               <form
                 @submit.prevent="agregarPlantilla"
                 enctype="multipart/form-data"
@@ -98,13 +105,20 @@
                 </div>
                 <div class="form-group">
                   <label for="tipoAgregar">Tipo:</label>
-                  <input
-                    type="text"
+                  <select
                     class="form-control"
                     id="tipoAgregar"
                     v-model="nuevaPlantilla.tipo"
                     required
-                  />
+                  >
+                    <option value="" disabled selected>
+                      Seleccione un tipo de plantilla
+                    </option>
+                    <option value="Adobe Illustrator">Adobe Illustrator</option>
+                    <option value="Excel">Excel</option>
+                    <option value="Word">Word</option>
+                    <option value="PDF">PDF</option>
+                  </select>
                 </div>
                 <div class="form-group">
                   <label for="rutaArchivoAgregar">Archivo:</label>
@@ -134,6 +148,7 @@
           </div>
         </div>
       </div>
+
       <!-- Modal para modificar plantilla -->
       <div
         class="modal fade"
@@ -156,7 +171,6 @@
               ></button>
             </div>
             <div class="modal-body">
-              <!-- Formulario para modificar plantilla -->
               <form v-if="plantillaActual" @submit.prevent="modificarPlantilla">
                 <div class="form-group">
                   <label for="nombreModificar">Nombre:</label>
@@ -180,13 +194,20 @@
                 </div>
                 <div class="form-group">
                   <label for="tipoModificar">Tipo:</label>
-                  <input
-                    type="text"
+                  <select
                     class="form-control"
                     id="tipoModificar"
                     v-model="plantillaActual.tipo"
                     required
-                  />
+                  >
+                    <option value="" disabled selected>
+                      Seleccione un tipo de plantilla
+                    </option>
+                    <option value="Adobe Illustrator">Adobe Illustrator</option>
+                    <option value="Excel">Excel</option>
+                    <option value="Word">Word</option>
+                    <option value="PDF">PDF</option>
+                  </select>
                 </div>
                 <div class="form-group">
                   <label for="rutaArchivoModificar">Ruta Archivo:</label>
@@ -229,9 +250,11 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Modal } from "bootstrap";
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
-  name: "plantillaAdmin",
+  components: { Pagination },
+  name: "PlantillaAdmin",
   data() {
     return {
       plantillas: [],
@@ -243,17 +266,37 @@ export default {
         ruta_archivo: "",
         etiquetas: "",
       },
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchPlantillas();
   },
+  watch: {
+    plantillas() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.plantillas.slice(start, end);
+    },
     fetchPlantillas() {
       axios
         .get("/api/plantillas")
         .then((response) => {
           this.plantillas = response.data;
+          this.paginatedData = this.getPaginatedData();
         })
         .catch((error) => {
           console.error("Error al obtener las plantillas:", error);
@@ -273,20 +316,32 @@ export default {
         etiquetas: "",
       };
     },
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      this.nuevaPlantilla.ruta_archivo = file;
+    },
     agregarPlantilla() {
+      const formData = new FormData();
+      formData.append("nombre", this.nuevaPlantilla.nombre);
+      formData.append("descripcion", this.nuevaPlantilla.descripcion);
+      formData.append("tipo", this.nuevaPlantilla.tipo);
+      formData.append("ruta_archivo", this.nuevaPlantilla.ruta_archivo);
+      formData.append("etiquetas", this.nuevaPlantilla.etiquetas);
+
       axios
-        .post("/api/plantillas", this.nuevaPlantilla)
+        .post("/api/plantillas", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         .then((response) => {
-          // Agrega la nueva plantilla a la lista localmente
           this.plantillas.push({
             ...this.nuevaPlantilla,
             id: response.data.id,
+            ruta_archivo: `/uploads/plantillas/${response.data.filename}`, // Actualiza la ruta de archivo
           });
-          // Cierra el modal de agregar
-          const modal = document.getElementById("modalAgregar");
-          const bootstrapModal = Modal.getOrCreateInstance(modal); // Usa el objeto Modal de Bootstrap
-          bootstrapModal.hide();
-          // Muestra un mensaje de éxito
+          this.resetModal("modalAgregar");
+          this.paginatedData = this.getPaginatedData(); // Actualiza la tabla
           Swal.fire("Agregado", "La plantilla ha sido agregada.", "success");
         })
         .catch((error) => {
@@ -305,18 +360,13 @@ export default {
       axios
         .put(`/api/plantillas/${this.plantillaActual.id}`, this.plantillaActual)
         .then(() => {
-          // Cierra el modal de modificación
-          const modal = document.getElementById("modalModificar");
-          const bootstrapModal = Modal.getOrCreateInstance(modal); // Usa el objeto Modal de Bootstrap
-          bootstrapModal.hide();
-          // Muestra un mensaje de éxito
+          this.resetModal("modalModificar");
+          this.fetchPlantillas();
           Swal.fire(
             "Modificado",
             "La plantilla ha sido modificada.",
             "success"
           );
-          // Actualiza la lista de plantillas
-          this.fetchPlantillas();
         })
         .catch((error) => {
           console.error("Error al modificar la plantilla:", error);
@@ -347,12 +397,12 @@ export default {
       axios
         .delete(`/api/plantillas/${plantillaId}`)
         .then(() => {
-          // Eliminar la plantilla de la lista localmente
           const index = this.plantillas.findIndex(
             (plantilla) => plantilla.id === plantillaId
           );
           if (index !== -1) {
             this.plantillas.splice(index, 1);
+            this.paginatedData = this.getPaginatedData();
             Swal.fire(
               "Eliminado",
               "La plantilla ha sido eliminada.",
@@ -369,11 +419,16 @@ export default {
           });
         });
     },
-    resetModal() {
-      this.plantillaActual = null;
-      const modal = document.getElementById("modalModificar");
-      const bootstrapModal = Modal.getOrCreateInstance(modal); // Usa el objeto Modal de Bootstrap
+    resetModal(modalId) {
+      const modal = document.getElementById(modalId);
+      const bootstrapModal = Modal.getOrCreateInstance(modal);
       bootstrapModal.hide();
+
+      document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+        backdrop.parentNode.removeChild(backdrop);
+      });
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
     },
   },
 };

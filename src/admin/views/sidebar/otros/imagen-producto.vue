@@ -8,7 +8,7 @@
           <th>Imagen</th>
           <th>Acciones</th>
         </tr>
-        <tr v-for="imagenProducto in imagenProductos" :key="imagenProducto.id">
+        <tr v-for="imagenProducto in paginatedData" :key="imagenProducto.id">
           <td>{{ imagenProducto.nombre_producto }}</td>
           <td>
             <img
@@ -19,12 +19,12 @@
           </td>
           <td>
             <button
-              @click="verDetalles(imagenProducto)"
+              @click="prepararModificacion(imagenProducto)"
               class="btn btn-sm btn-info"
               data-bs-toggle="modal"
               data-bs-target="#myModal"
             >
-              Ver Detalles
+              Modificar
             </button>
             <button
               @click="confirmarEliminar(imagenProducto.id)"
@@ -35,63 +35,22 @@
           </td>
         </tr>
       </table>
-
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="imagenProductos.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <button
-        @click="resetModal"
-        class="btn btn-primary"
+        type="button"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
         Agregar Imagen
       </button>
 
-      <div
-        class="modal fade"
-        id="myModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Detalles del imagen producto
-              </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <template v-if="imagenProductoActual">
-                <p>
-                  <strong>Producto:</strong>
-                  {{ imagenProductoActual.nombre_producto }}
-                </p>
-                <p>
-                  <strong>Imagen:</strong> {{ imagenProductoActual.url_imagen }}
-                </p>
-              </template>
-              <template v-else>
-                <p>No se ha seleccionado ningún imagen producto.</p>
-              </template>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <!-- Modal para agregar imagen -->
       <div
         class="modal fade"
         id="modalAgregar"
@@ -136,21 +95,88 @@
                     type="file"
                     class="form-control"
                     id="imagen"
-                    @change="onFileChange"
+                    @change="onFileChange($event, 'nuevoProducto')"
                     required
                   />
                 </div>
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-success">Agregar</button>
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Cerrar
-                  </button>
+                  <button type="submit" class="btn btn-agregar">Agregar</button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal para modificar imagen -->
+      <div
+        class="modal fade"
+        id="myModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">
+                Modificar Imagen
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <template v-if="imagenProductoActual">
+                <div class="mb-3">
+                  <label for="productoModificar" class="form-label"
+                    >Producto</label
+                  >
+                  <select
+                    class="form-control"
+                    id="productoModificar"
+                    v-model="imagenProductoActual.producto_id"
+                    required
+                  >
+                    <option value="" disabled>Seleccione un producto</option>
+                    <option
+                      v-for="producto in productos"
+                      :key="producto.id"
+                      :value="producto.id"
+                    >
+                      {{ producto.nombre }}
+                    </option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="imagenModificar" class="form-label">Imagen</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="imagenModificar"
+                    @change="onFileChange($event, 'imagenProductoActual')"
+                  />
+                </div>
+              </template>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="actualizarImagen"
+              >
+                Guardar cambios
+              </button>
             </div>
           </div>
         </div>
@@ -162,29 +188,48 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap";
+import { Modal } from "bootstrap";
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
+  components: { Pagination },
   name: "imagenProductoAdmin",
   data() {
     return {
       imagenProductos: [],
       productos: [],
-      modalTitle: "Detalles del imagenProducto",
       imagenProductoActual: null,
       nuevoProducto: {
         producto_id: "",
-        url_imagen: "",
+        imagen: null,
       },
       selectedFile: null,
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchImagenProductos();
     this.fetchProductos();
   },
+  watch: {
+    imagenProductos() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.imagenProductos.slice(start, end);
+    },
     fetchImagenProductos() {
       axios
         .get("/api/imagenesProducto")
@@ -215,28 +260,30 @@ export default {
           });
         });
     },
-    onFileChange(e) {
-      this.selectedFile = e.target.files[0];
+    onFileChange(event, target) {
+      const file = event.target.files[0];
+      if (file) {
+        this[target].imagen = file;
+      }
     },
-    verDetalles(imagenProducto) {
-      this.imagenProductoActual = imagenProducto;
-    },
-    agregarImagen() {
-      if (!this.selectedFile) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Debe seleccionar una imagen antes de agregar.",
-        });
-        return;
+    cerrarModal(idModal) {
+      const modal = document.getElementById(idModal);
+      const bootstrapModal = Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
       }
 
+      // Elimina manualmente el backdrop
+      document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+        backdrop.parentNode.removeChild(backdrop);
+      });
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
+    },
+    agregarImagen() {
       const formData = new FormData();
       formData.append("producto_id", this.nuevoProducto.producto_id);
-      formData.append("imagen", this.selectedFile);
-
-      console.log("Producto ID:", this.nuevoProducto.producto_id);
-      console.log("Selected File:", this.selectedFile);
+      formData.append("imagen", this.nuevoProducto.imagen);
 
       axios
         .post("/api/imagenesProducto", formData, {
@@ -244,25 +291,57 @@ export default {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then((response) => {
-          console.log("Response:", response.data);
-          this.imagenProductos.push(response.data);
-          this.resetModal();
-          const modalElement = document.getElementById("modalAgregar");
-          const modal = new bootstrap.Modal(modalElement);
-          modal.hide();
+        .then(() => {
+          this.fetchImagenProductos();
+          this.nuevoProducto = {
+            producto_id: "",
+            imagen: null,
+          };
+          this.cerrarModal("modalAgregar");
           Swal.fire({
             icon: "success",
             title: "Éxito",
-            text: "Imagen producto agregada exitosamente",
+            text: "Imagen de producto agregada correctamente",
           });
         })
         .catch((error) => {
-          console.error("Error al agregar la imagen producto:", error);
+          console.error("Error al agregar la imagen de producto:", error);
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Error al agregar la imagen producto. Por favor, intenta de nuevo más tarde.",
+            text: "Error al agregar la imagen de producto. Por favor, intenta de nuevo más tarde.",
+          });
+        });
+    },
+    prepararModificacion(imagenProducto) {
+      this.imagenProductoActual = { ...imagenProducto };
+    },
+    actualizarImagen() {
+      const formData = new FormData();
+      formData.append("producto_id", this.imagenProductoActual.producto_id);
+      if (this.imagenProductoActual.imagen instanceof File) {
+        formData.append("imagen", this.imagenProductoActual.imagen);
+      } else {
+        formData.append("url_imagen", this.imagenProductoActual.url_imagen);
+      }
+
+      axios
+        .put(`/api/imagenesProducto/${this.imagenProductoActual.id}`, formData)
+        .then(() => {
+          this.fetchImagenProductos();
+          this.cerrarModal("myModal");
+          Swal.fire({
+            icon: "success",
+            title: "Éxito",
+            text: "Imagen de producto actualizada correctamente",
+          });
+        })
+        .catch((error) => {
+          console.error("Error al actualizar la imagen de producto:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Error al actualizar la imagen de producto. Por favor, intenta de nuevo más tarde.",
           });
         });
     },
@@ -286,33 +365,21 @@ export default {
       axios
         .delete(`/api/imagenesProducto/${imagenProductoId}`)
         .then(() => {
-          const index = this.imagenProductos.findIndex(
-            (imagenProducto) => imagenProducto.id === imagenProductoId
-          );
-          if (index !== -1) {
-            this.imagenProductos.splice(index, 1);
-            Swal.fire(
-              "Eliminado",
-              "La imagen producto ha sido eliminada.",
-              "success"
-            );
-          }
+          this.fetchImagenProductos();
+          Swal.fire({
+            icon: "success",
+            title: "Éxito",
+            text: "Imagen de producto eliminada correctamente",
+          });
         })
         .catch((error) => {
-          console.error("Error al eliminar la imagen producto:", error);
+          console.error("Error al eliminar la imagen de producto:", error);
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Error al eliminar la imagen producto. Por favor, intenta de nuevo más tarde.",
+            text: "Error al eliminar la imagen de producto. Por favor, intenta de nuevo más tarde.",
           });
         });
-    },
-    resetModal() {
-      this.nuevoProducto = {
-        producto_id: "",
-        url_imagen: "",
-      };
-      this.selectedFile = null;
     },
   },
 };

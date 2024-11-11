@@ -114,9 +114,6 @@
                 <div class="field padding-bottom--24">
                   <div class="grid--50-50">
                     <label for="password">Contraseña</label>
-                    <div class="reset-pass">
-                      <a href="#">¿Olvidaste tu contraseña?</a>
-                    </div>
                   </div>
                   <input type="password" name="password" v-model="password" />
                 </div>
@@ -138,15 +135,6 @@
               </form>
             </div>
           </div>
-          <div class="footer-link padding-top--24">
-            <div
-              class="listing padding-top--24 padding-bottom--24 flex-flex center-center"
-            >
-              <span><a href="#">© Stackfindover</a></span>
-              <span><a href="#">Contacto</a></span>
-              <span><a href="#">Privacidad y términos</a></span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -158,7 +146,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 export default {
-  name: "Index-admin",
+  name: "Login",
   data() {
     return {
       rut: "",
@@ -170,31 +158,18 @@ export default {
     const rememberMe = localStorage.getItem("rememberMe");
     this.rememberMe = rememberMe === "true";
   },
-
   methods: {
     async login() {
-      if (!this.rut) {
+      if (!this.rut || !this.password) {
         Swal.fire({
           icon: "warning",
-          title: "Campo vacío",
-          text: "El campo RUT no puede estar vacío",
-        });
-        return;
-      }
-
-      if (!this.password) {
-        Swal.fire({
-          icon: "warning",
-          title: "Campo vacío",
-          text: "El campo Contraseña no puede estar vacío",
+          title: "Campos vacíos",
+          text: "Los campos RUT y Contraseña no pueden estar vacíos",
         });
         return;
       }
 
       try {
-        console.log("Intentando iniciar sesión con RUT:", this.rut);
-        console.log("Y contraseña:", this.password);
-
         const response = await axios.post(
           "http://localhost:3000/api/auth/login",
           {
@@ -203,17 +178,14 @@ export default {
           }
         );
 
-        // Almacenar el token y el RUT del trabajador en localStorage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("workerRut", this.rut);
-
-        console.log("Inicio de sesión exitoso:", response.data);
 
         Swal.fire({
           icon: "success",
           title: "Inicio de sesión exitoso",
           text: "Has iniciado sesión correctamente",
-          timer: 1500, // Cerrar automáticamente después de 1.5 segundos
+          timer: 1500,
           showConfirmButton: false,
         }).then(() => {
           if (this.rememberMe) {
@@ -221,54 +193,54 @@ export default {
           } else {
             localStorage.removeItem("rememberMe");
           }
-          this.$router.push("/admin/principal");
+          this.$router.push({ name: "AdminPrincipal" });
         });
       } catch (error) {
-        console.error("Error al iniciar sesión:", error);
+        this.handleLoginError(error);
+      }
+    },
+    handleLoginError(error) {
+      console.error("Error al iniciar sesión:", error);
+      if (error.response) {
+        console.error("Datos del error:", error.response.data);
+        console.error("Estado del error:", error.response.status);
+        console.error("Cabeceras del error:", error.response.headers);
 
-        if (error.response) {
-          console.error("Datos del error:", error.response.data);
-          console.error("Estado del error:", error.response.status);
-          console.error("Cabeceras del error:", error.response.headers);
-
-          if (error.response.status === 401) {
-            Swal.fire({
-              icon: "error",
-              title: "Error al iniciar sesión",
-              text: "Credenciales incorrectas",
-            });
-          } else if (error.response.status === 400) {
-            Swal.fire({
-              icon: "error",
-              title: "Error al iniciar sesión",
-              text:
-                error.response.data.error || "RUT y/o contraseña incorrectos",
-            });
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Error al iniciar sesión",
-              text: "Ocurrió un error inesperado. Por favor, intente nuevamente más tarde.",
-            });
-          }
-        } else if (error.request) {
-          console.error("No se recibió respuesta del servidor:", error.request);
+        if (error.response.status === 401) {
           Swal.fire({
             icon: "error",
-            title: "Error de red",
-            text: "No se pudo conectar con el servidor. Por favor, intente nuevamente más tarde.",
+            title: "Error al iniciar sesión",
+            text: "Credenciales incorrectas",
+          });
+        } else if (error.response.status === 400) {
+          Swal.fire({
+            icon: "error",
+            title: "Error al iniciar sesión",
+            text: error.response.data.error || "RUT y/o contraseña incorrectos",
           });
         } else {
-          console.error("Error al configurar la solicitud:", error.message);
           Swal.fire({
             icon: "error",
-            title: "Error",
+            title: "Error al iniciar sesión",
             text: "Ocurrió un error inesperado. Por favor, intente nuevamente más tarde.",
           });
         }
+      } else if (error.request) {
+        console.error("No se recibió respuesta del servidor:", error.request);
+        Swal.fire({
+          icon: "error",
+          title: "Error de red",
+          text: "No se pudo conectar con el servidor. Por favor, intente nuevamente más tarde.",
+        });
+      } else {
+        console.error("Error al configurar la solicitud:", error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Ocurrió un error inesperado. Por favor, intente nuevamente más tarde.",
+        });
       }
     },
-
     formatRUT() {
       let value = this.rut.replace(/\./g, "").replace(/-/g, "");
       if (value.length > 1) {
@@ -289,3 +261,4 @@ export default {
 <style scoped>
 @import "../admin/assets/styles/index.css";
 </style>
+

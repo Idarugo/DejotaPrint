@@ -37,7 +37,7 @@
       </table>
       <button
         @click="prepararAgregar"
-        class="btn btn-primary mb-3"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >

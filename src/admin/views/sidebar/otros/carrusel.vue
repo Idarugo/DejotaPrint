@@ -11,7 +11,7 @@
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
-        <tr v-for="carrusel in carrusels" :key="carrusel.id">
+        <tr v-for="carrusel in paginatedData" :key="carrusel.id">
           <td>{{ carrusel.titulo }}</td>
           <td>
             <img
@@ -47,9 +47,15 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="carrusels.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <button
         type="button"
-        class="btn btn-primary mb-3"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
@@ -67,7 +73,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="modalAgregarLabel">
-                Agregar nuevo carrusel
+                Agregar Carrusel
               </h5>
               <button
                 type="button"
@@ -120,7 +126,7 @@
                   />
                 </div>
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary">Agregar</button>
+                  <button type="submit" class="btn btn-agregar">Agregar</button>
                 </div>
               </form>
             </div>
@@ -189,8 +195,11 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
+import * as bootstrap from "bootstrap"; // Importa bootstrap aquí
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
+  components: { Pagination },
   name: "carruselAdmin",
   data() {
     return {
@@ -204,12 +213,31 @@ export default {
         posicion: "",
         estado: 1,
       },
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchCarrusels();
   },
+  watch: {
+    carrusels() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.carrusels.slice(start, end);
+    },
     fetchCarrusels() {
       axios
         .get("/api/carrusel")
@@ -229,7 +257,6 @@ export default {
       if (
         !this.createCarrusel.titulo ||
         !this.createCarrusel.imagen ||
-        !this.createCarrusel.enlace ||
         !this.createCarrusel.posicion
       ) {
         Swal.fire(
@@ -253,26 +280,29 @@ export default {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then(() => {
-          this.createCarrusel = {
-            titulo: "",
-            imagen: null,
-            enlace: "",
-            posicion: "",
-            estado: 1,
-          };
-          this.fetchCarrusels();
-          // Manejar el cierre del modal sin jQuery
-          const modalElement = document.getElementById("modalAgregar");
-          const modal = bootstrap.Modal.getInstance(modalElement);
-          if (modal) {
-            modal.hide();
+        .then((response) => {
+          if (response.status === 201) {
+            this.createCarrusel = {
+              titulo: "",
+              imagen: null,
+              enlace: "",
+              posicion: "",
+              estado: 1,
+            };
+            this.fetchCarrusels();
+            this.resetModal("modalAgregar");
+            Swal.fire(
+              "Carrusel agregado",
+              "El carrusel ha sido agregado correctamente.",
+              "success"
+            );
+          } else {
+            Swal.fire(
+              "Error",
+              "Hubo un error al agregar el carrusel. Por favor, intenta de nuevo más tarde.",
+              "error"
+            );
           }
-          Swal.fire(
-            "Carrusel agregado",
-            "El carrusel ha sido agregado correctamente.",
-            "success"
-          );
         })
         .catch((error) => {
           console.error("Error al agregar el carrusel:", error);
@@ -347,6 +377,23 @@ export default {
     },
     estadocarrusel(estado) {
       return estado === 1 ? "Habilitado" : "Deshabilitado";
+    },
+    resetModal(modalId) {
+      this.createCarrusel = {
+        titulo: "",
+        imagen: null,
+        enlace: "",
+        posicion: "",
+        estado: 1,
+      };
+      const modal = document.getElementById(modalId);
+      const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modal);
+      bootstrapModal.hide();
+
+      const backdrops = document.querySelectorAll(".modal-backdrop");
+      backdrops.forEach((backdrop) => backdrop.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
     },
   },
 };

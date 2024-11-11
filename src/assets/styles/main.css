@@ -11,6 +11,15 @@
   width: 100%;
 }
 
+.btn-producto {
+  background-color: #333;
+  color: white;
+}
+
+.btn-producto:hover {
+  background-color: #555;
+  color: white;
+}
 /* Nueva Sección */
 .nueva-seccion {
   background-color: #fff;
@@ -218,7 +227,7 @@
   max-width: 100%;
 }
 
-/* productos */
+/* Productos */
 .productos {
   background-color: #fff;
   padding: 2rem 0;
@@ -329,75 +338,24 @@ button {
   margin-bottom: 2rem;
 }
 
-.ofertas-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.oferta {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin: 1rem;
-  padding: 2rem;
-  text-align: left;
-  width: 300px;
-}
-
-.imagen-placeholder {
-  align-items: center;
-  background-color: #eaeaea;
-  display: flex;
-  height: 200px;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.imagen-placeholder img {
-  max-height: 100%;
-  max-width: 100%;
-}
-
-.oferta h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.oferta p {
-  color: #666;
-  margin-bottom: 1rem;
-}
-
-.precios {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.precio-original {
-  color: #999;
-  text-decoration: line-through;
-}
-
-.precio-descuento {
+.oferta-precio-descuento {
   color: #e60023;
   font-size: 1.25rem;
   font-weight: bold;
 }
 
-button {
+.oferta-especial button {
   background-color: #333;
   border: none;
   border-radius: 4px;
   color: #fff;
   cursor: pointer;
   padding: 0.75rem 1.5rem;
+  transition: background-color 0.2s;
   width: 100%;
 }
 
-button:hover {
+.oferta-especial button:hover {
   background-color: #555;
 }
 
@@ -504,4 +462,73 @@ button:hover {
 .cliente-detalles span {
   color: #666;
   font-size: 0.875rem;
+}
+
+/* Ubicación */
+.ubicacion {
+  background-color: #f8f9fa;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.ubicacion h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.ubicacion p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nueva-seccion .contenido,
+  .sobre-nosotros .contenido {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .nueva-seccion .texto,
+  .sobre-nosotros .texto {
+    margin: 0;
+    margin-bottom: 2rem;
+  }
+
+  .nueva-seccion .imagen-placeholder,
+  .sobre-nosotros .imagen-placeholder {
+    margin-bottom: 2rem;
+  }
+
+  .servicios-container,
+  .disenos-container,
+  .productos-container,
+  .ofertas-especiales-container,
+  .clientes-container {
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .servicio,
+  .diseno,
+  .producto,
+  .oferta-especial,
+  .cliente {
+    margin-bottom: 2rem;
+    width: 80%;
+  }
+
+  .carousel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .servicio,
+  .diseno,
+  .producto,
+  .oferta-especial,
+  .cliente {
+    width: 100%;
+  }
 }

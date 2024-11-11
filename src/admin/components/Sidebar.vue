@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isAuthenticated">
     <div class="menu" @click="toggleSidebar">
       <ion-icon name="menu-outline" v-if="!sidebarCollapsed"></ion-icon>
       <ion-icon name="close-outline" v-else></ion-icon>
@@ -7,7 +7,7 @@
 
     <div
       class="barra-lateral"
-      :class="{ 'max-barra-lateral': sidebarCollapsed }"
+      :class="{ 'mini-barra-lateral': sidebarCollapsed }"
     >
       <div>
         <div class="nombre-pagina">
@@ -48,7 +48,7 @@
               <ion-icon name="cart-outline"></ion-icon>
               <span>
                 <router-link to="/admin/producto" class="nav-link"
-                  >Producto</router-link
+                  >Productos</router-link
                 >
               </span>
             </a>
@@ -58,7 +58,17 @@
               <ion-icon name="trending-down-outline"></ion-icon>
               <span>
                 <router-link to="/admin/oferta" class="nav-link"
-                  >Oferta</router-link
+                  >Ofertas</router-link
+                >
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <ion-icon name="cash-outline"></ion-icon>
+              <span>
+                <router-link to="/admin/cotizacion" class="nav-link"
+                  >Cotizacion</router-link
                 >
               </span>
             </a>
@@ -68,7 +78,7 @@
               <ion-icon name="happy-outline"></ion-icon>
               <span>
                 <router-link to="/admin/resena" class="nav-link"
-                  >Reseña</router-link
+                  >Reseñas</router-link
                 >
               </span>
             </a>
@@ -95,10 +105,10 @@
           </li>
           <li>
             <a href="#">
-              <ion-icon name="chatbubbles-outline"></ion-icon>
+              <ion-icon name="bag-check-outline"></ion-icon>
               <span>
-                <router-link to="/admin/testimonios" class="nav-link"
-                  >Testimonios</router-link
+                <router-link to="/admin/pedidos" class="nav-link"
+                  >Pedidos</router-link
                 >
               </span>
             </a>
@@ -115,10 +125,30 @@
           </li>
           <li>
             <a href="#">
-              <ion-icon name="call-outline"></ion-icon>
+              <ion-icon name="cart-outline"></ion-icon>
               <span>
-                <router-link to="/admin/contacto" class="nav-link"
-                  >Contacto</router-link
+                <router-link to="/admin/diseno" class="nav-link"
+                  >Diseños</router-link
+                >
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <ion-icon name="document-attach-outline"></ion-icon>
+              <span>
+                <router-link to="/admin/plantillas" class="nav-link"
+                  >Plantillas</router-link
+                >
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <ion-icon name="pricetags-outline"></ion-icon>
+              <span>
+                <router-link to="/admin/descuentos" class="nav-link"
+                  >Descuentos</router-link
                 >
               </span>
             </a>
@@ -134,15 +164,7 @@
             <ul class="otros-submenu" v-show="showOtros">
               <li>
                 <a href="#">
-                  <span>
-                    <router-link to="/admin/plantillas" class="nav-link"
-                      >Plantillas</router-link
-                    >
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a href="#">
+                  <ion-icon name="film-outline"></ion-icon>
                   <span>
                     <router-link to="/admin/carrusel" class="nav-link"
                       >Carrusel</router-link
@@ -152,6 +174,7 @@
               </li>
               <li>
                 <a href="#">
+                  <ion-icon name="help-circle-outline"></ion-icon>
                   <span>
                     <router-link
                       to="/admin/preguntas-frecuentes"
@@ -161,8 +184,46 @@
                   </span>
                 </a>
               </li>
-
-              <!-- Agrega más rutas aquí según sea necesario -->
+              <li>
+                <a href="#">
+                  <ion-icon name="pricetags-outline"></ion-icon>
+                  <span>
+                    <router-link to="/admin/marcas" class="nav-link"
+                      >Marcas</router-link
+                    >
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <ion-icon name="heart-circle-outline"></ion-icon>
+                  <span>
+                    <router-link to="/admin/resena" class="nav-link"
+                      >Reseñas</router-link
+                    >
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <ion-icon name="chatbubbles-outline"></ion-icon>
+                  <span>
+                    <router-link to="/admin/testimonios" class="nav-link"
+                      >Testimonios</router-link
+                    >
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <ion-icon name="call-outline"></ion-icon>
+                  <span>
+                    <router-link to="/admin/contacto" class="nav-link"
+                      >Contacto</router-link
+                    >
+                  </span>
+                </a>
+              </li>
             </ul>
           </li>
           <li class="cerrar-sesion">
@@ -191,8 +252,8 @@
 
         <div class="usuario">
           <img src="../assets/img/usuario.png" alt="Imagen de usuario" />
-          <div class="info-usuario">
-            <div class="nombre-email" v-if="trabajador">
+          <div class="info-usuario" v-if="trabajador">
+            <div class="nombre-email">
               <span class="nombre">{{ trabajador.nombre }}</span>
               <span class="email">{{ trabajador.correo }}</span>
             </div>
@@ -204,28 +265,31 @@
       </div>
     </div>
   </div>
-  <router-view />
 </template>
-
 <script>
 import Swal from "sweetalert2";
+import EventBus from "@/admin/services/eventBus";
 
 export default {
-  name: "SidebarAdmin",
   data() {
     return {
       darkMode: false,
       sidebarCollapsed: false,
       busqueda: "",
       trabajador: null,
-      showOtros: false, // Nueva propiedad para controlar el submenú
+      showOtros: false,
+      isAuthenticated: false,
     };
   },
   created() {
     const isDarkMode = localStorage.getItem("darkMode") === "true";
     this.darkMode = isDarkMode;
     document.body.classList.toggle("dark-mode", isDarkMode);
-    this.fetchUserData();
+    this.checkAuthentication();
+    EventBus.on("trabajador-actualizado", this.actualizarTrabajador);
+  },
+  beforeUnmount() {
+    EventBus.off("trabajador-actualizado", this.actualizarTrabajador);
   },
   methods: {
     async fetchUserData() {
@@ -246,6 +310,9 @@ export default {
       } catch (error) {
         console.error("Error al obtener los datos del usuario:", error);
       }
+    },
+    actualizarTrabajador(trabajador) {
+      this.trabajador = trabajador;
     },
     toggleSidebar() {
       this.sidebarCollapsed = !this.sidebarCollapsed;
@@ -271,19 +338,26 @@ export default {
       this.showOtros = !this.showOtros;
     },
     volverInicio() {
-      // Eliminar el token del almacenamiento local
       localStorage.removeItem("token");
 
-      // Mostrar SweetAlert de confirmación
       Swal.fire({
         icon: "success",
         title: "¡Se ha cerrado sesión exitosamente!",
         showConfirmButton: false,
-        timer: 1500, // Cerrar automáticamente después de 1.5 segundos
+        timer: 1500,
       }).then(() => {
-        // Forzar recarga completa de la página
         window.location.href = "/";
       });
+    },
+    checkAuthentication() {
+      const token = localStorage.getItem("token");
+      if (token) {
+        this.isAuthenticated = true;
+        this.fetchUserData();
+      } else {
+        this.isAuthenticated = false;
+        this.$router.push({ name: "admin-login" });
+      }
     },
   },
 };
@@ -294,13 +368,13 @@ export default {
 
 /* CSS adicional para el submenú */
 .otros-submenu {
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Agrega sombra para estilo */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   display: none;
   left: 0;
   position: relative;
-  top: 0; /* Ajusta la distancia vertical */
+  top: 0;
   width: 100%;
-  z-index: 2; /* Asegúrate de que el submenú esté sobre otros elementos */
+  z-index: 2;
 }
 
 .navegacion > ul > li {
@@ -308,11 +382,10 @@ export default {
 }
 
 .flecha-rotada {
-  transform: rotate(180deg); /* Rota la flecha */
-  transition: transform 0.3s ease; /* Agrega una transición suave */
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
 }
 
-/* Estilo para mostrar el submenú cuando se activa */
 .otros-submenu {
   display: block;
 }

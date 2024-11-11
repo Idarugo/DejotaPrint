@@ -5,6 +5,8 @@
 }
 body {
   background-color: var(--body-color);
+  margin: 0;
+  padding: 0;
 }
 
 .container {
@@ -13,6 +15,16 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 10px auto;
   padding: 50px;
+}
+
+.btn-agregar {
+  background-color: #333;
+  color: white;
+}
+
+.btn-agregar:hover {
+  background-color: #555;
+  color: white;
 }
 
 .form-control {
@@ -149,4 +161,38 @@ th {
     font-size: 12px;
     padding: 6px 10px;
   }
+}
+
+.custom-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.custom-pagination .pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.custom-pagination .pagination li {
+  margin: 0 5px;
+}
+
+.custom-pagination .pagination li a {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #007bff;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.custom-pagination .pagination li a:hover {
+  background-color: #f1f1f1;
+}
+
+.custom-pagination .pagination li.active a {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
 }

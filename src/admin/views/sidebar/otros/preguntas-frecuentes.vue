@@ -11,7 +11,7 @@
           <th>Acciones</th>
         </tr>
         <!-- Filas de la tabla -->
-        <tr v-for="faq in faqs" :key="faq.id">
+        <tr v-for="faq in paginatedData" :key="faq.id">
           <td>{{ faq.pregunta }}</td>
           <td>{{ faq.respuesta }}</td>
           <td>{{ faq.nombre_subcategoria }}</td>
@@ -44,9 +44,15 @@
           </td>
         </tr>
       </table>
+      <Pagination
+        :currentPage="currentPage"
+        :totalItems="faqs.length"
+        :pageSize="pageSize"
+        @page-changed="onPageChange"
+      />
       <button
         type="button"
-        class="btn btn-primary mb-3"
+        class="btn btn-agregar"
         data-bs-toggle="modal"
         data-bs-target="#modalAgregar"
       >
@@ -124,13 +130,14 @@
                     >Fecha Creacion:</label
                   >
                   <input
+                    class="form-control"
                     id="fecha_creacion"
                     v-model="createFaq.fecha_creacion"
                     disabled
                   />
                 </div>
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary">Agregar</button>
+                  <button type="submit" class="btn btn-agregar">Agregar</button>
                 </div>
               </form>
             </div>
@@ -214,7 +221,7 @@
                   />
                 </div>
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary">
+                  <button type="submit" class="btn btn-agregar">
                     Guardar Cambios
                   </button>
                 </div>
@@ -290,34 +297,55 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
-import * as bootstrap from "bootstrap"; // Importa bootstrap aquí
+import * as bootstrap from "bootstrap";
+import Pagination from "../../../components/Pagination.vue";
 
 export default {
+  components: { Pagination },
   data() {
     return {
       faqs: [],
-      cat_faqs: [], // Inicializamos cat_faqs
+      cat_faqs: [],
       modalTitle: "Detalles de Pregunta",
-      faqActual: null, // Variable para almacenar el faq actual
+      faqActual: null,
       createFaq: {
         pregunta: "",
         respuesta: "",
         subcat_id: "",
         fecha_creacion: "",
       },
-      fechaActual: new Date().toISOString().slice(0, 10), // Fecha actual
+      fechaActual: new Date().toISOString().slice(0, 10),
+      paginatedData: [],
+      currentPage: 1,
+      pageSize: 5,
     };
   },
   created() {
     this.fetchfaqs();
     this.fetchCatfaq();
   },
+  watch: {
+    faqs() {
+      this.paginatedData = this.getPaginatedData();
+    },
+    currentPage() {
+      this.paginatedData = this.getPaginatedData();
+    },
+  },
   methods: {
+    onPageChange(page) {
+      this.currentPage = page;
+    },
+    getPaginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.faqs.slice(start, end);
+    },
     fetchCatfaq() {
       axios
-        .get("/api/cat_faq") // Ruta del endpoint para obtener todos los productos
+        .get("/api/cat_faq")
         .then((response) => {
-          this.cat_faqs = response.data; // Almacenamos los productos en la propiedad cat_faqs
+          this.cat_faqs = response.data;
         })
         .catch((error) => {
           console.error("Error al obtener los tipo de preguntas:", error);
@@ -328,12 +356,11 @@ export default {
           });
         });
     },
-
     fetchfaqs() {
       axios
         .get("/api/faqs")
         .then((response) => {
-          console.log("Datos recibidos:", response.data); // Verificar los datos recibidos
+          console.log("Datos recibidos:", response.data);
           this.faqs = response.data;
         })
         .catch((error) => {
@@ -345,9 +372,7 @@ export default {
           });
         });
     },
-
     agregarFaq() {
-      // Validación del formulario
       if (
         !this.createFaq.pregunta ||
         !this.createFaq.respuesta ||
@@ -361,29 +386,22 @@ export default {
         return;
       }
 
-      // Asignar la fecha actual
       const fechaActual = new Date().toISOString().slice(0, 10);
       this.createFaq.fecha_creacion = fechaActual;
 
-      // Enviar solicitud al servidor para agregar el faq
       axios
         .post("/api/faqs", this.createFaq)
         .then(() => {
-          // Limpiar el formulario
           this.createFaq = {
             pregunta: "",
             respuesta: "",
             subcat_id: "",
             fecha_creacion: "",
           };
-          // Cerrar el modal
-          const modalAgregar = bootstrap.Modal.getInstance(
-            document.getElementById("modalAgregar")
-          );
-          modalAgregar.hide();
-          // Actualizar la lista de FAQs
+
           this.fetchfaqs();
-          // Mostrar mensaje de éxito
+          this.resetModal("modalAgregar");
+
           Swal.fire(
             "Pregunta agregada",
             "La Pregunta ha sido agregada correctamente.",
@@ -392,7 +410,6 @@ export default {
         })
         .catch((error) => {
           console.error("Error al agregar pregunta:", error);
-          // Mostrar mensaje de error
           Swal.fire(
             "Error",
             "Hubo un error al agregar la pregunta. Por favor, intenta de nuevo más tarde.",
@@ -400,11 +417,9 @@ export default {
           );
         });
     },
-
     verDetalles(faq) {
       this.faqActual = faq;
     },
-
     confirmarEliminar(faqId) {
       Swal.fire({
         title: "¿Estás seguro?",
@@ -421,17 +436,12 @@ export default {
         }
       });
     },
-
     eliminarfaq(faqId) {
       axios
         .delete(`/api/faqs/${faqId}`)
         .then(() => {
-          // Eliminar el faq de la lista localmente
-          const index = this.faqs.findIndex((faq) => faq.id === faqId);
-          if (index !== -1) {
-            this.faqs.splice(index, 1);
-            Swal.fire("Eliminado", "Pregunta ha sido eliminada.", "success");
-          }
+          this.fetchfaqs();
+          Swal.fire("Eliminado", "Pregunta ha sido eliminada.", "success");
         })
         .catch((error) => {
           console.error("Error al eliminar la Pregunta:", error);
@@ -442,14 +452,12 @@ export default {
           });
         });
     },
-
     setFaqActual(faq) {
       this.faqActual = {
         ...faq,
         fecha_actualizacion: new Date().toISOString().slice(0, 10),
       };
     },
-
     modificarFaq() {
       if (!this.faqActual.pregunta || !this.faqActual.respuesta) {
         Swal.fire(
@@ -463,11 +471,9 @@ export default {
       axios
         .put(`/api/faqs/${this.faqActual.id}`, this.faqActual)
         .then(() => {
-          const modalModificar = bootstrap.Modal.getInstance(
-            document.getElementById("modalModificar")
-          );
-          modalModificar.hide();
           this.fetchfaqs();
+          this.resetModal("modalModificar");
+
           Swal.fire(
             "Pregunta modificada",
             "La Pregunta ha sido modificada correctamente.",
@@ -482,6 +488,23 @@ export default {
             "error"
           );
         });
+    },
+    resetModal(modalId) {
+      this.faqActual = null;
+      this.createFaq = {
+        pregunta: "",
+        respuesta: "",
+        subcat_id: "",
+        fecha_creacion: "",
+      };
+      const modal = document.getElementById(modalId);
+      const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modal);
+      bootstrapModal.hide();
+
+      const backdrops = document.querySelectorAll(".modal-backdrop");
+      backdrops.forEach((backdrop) => backdrop.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
     },
   },
   mounted() {

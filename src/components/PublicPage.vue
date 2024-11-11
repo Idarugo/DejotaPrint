@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="page-container">
     <Header />
+    <div class="content-wrapper"></div>
     <Footer />
     <WhatApp />
   </div>
@@ -19,3 +20,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  flex: 1;
+}
+</style>

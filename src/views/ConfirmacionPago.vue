@@ -12,16 +12,19 @@
         <div v-if="currentStep === 1">
           <h3>Contacto</h3>
           <input type="email" v-model="contacto.email" placeholder="E-mail" />
+          <p class="error-message" v-if="errors.email">
+            Este campo es requerido y debe ser un correo válido.
+          </p>
           <input
             type="text"
             v-model="contacto.rut"
             placeholder="RUT"
-            @input="
-              contacto.rutFacturacion = formatRUT(contacto.rutFacturacion)
-            "
+            @input="contacto.rut = formatRUT(contacto.rut)"
             maxlength="12"
           />
-          <p class="error-message">Este campo es requerido.</p>
+          <p class="error-message" v-if="errors.rut">
+            Este campo es requerido y debe ser un RUT válido.
+          </p>
           <h3>Entrega</h3>
           <div class="row">
             <div class="col-6">
@@ -30,6 +33,9 @@
                 v-model="contacto.nombre"
                 placeholder="Nombre"
               />
+              <p class="error-message" v-if="errors.nombre">
+                Este campo es requerido.
+              </p>
             </div>
             <div class="col-6">
               <input
@@ -37,13 +43,19 @@
                 v-model="contacto.apellido"
                 placeholder="Apellido"
               />
+              <p class="error-message" v-if="errors.apellido">
+                Este campo es requerido.
+              </p>
             </div>
             <div class="col-12">
               <input
                 type="text"
                 v-model="contacto.telefono"
-                placeholder="Numero Telefono"
+                placeholder="Número Teléfono"
               />
+              <p class="error-message" v-if="errors.telefono">
+                Este campo es requerido.
+              </p>
             </div>
             <div class="col-12">
               <select
@@ -59,6 +71,9 @@
                   {{ region.region }}
                 </option>
               </select>
+              <p class="error-message" v-if="errors.region">
+                Este campo es requerido.
+              </p>
             </div>
             <div class="col-12">
               <select v-model="contacto.comuna">
@@ -71,27 +86,36 @@
                   {{ comuna }}
                 </option>
               </select>
+              <p class="error-message" v-if="errors.comuna">
+                Este campo es requerido.
+              </p>
             </div>
             <div class="col-12">
               <input
                 type="text"
                 v-model="contacto.direccion"
-                placeholder="Direccion"
+                placeholder="Dirección"
               />
+              <p class="error-message" v-if="errors.direccion">
+                Este campo es requerido.
+              </p>
             </div>
             <div class="col-12">
               <input
                 type="text"
                 v-model="contacto.apartamento"
-                placeholder="Casa ,apartamento, etc. (opcional)"
+                placeholder="Casa, apartamento, etc. (opcional)"
               />
             </div>
             <div class="col-12">
               <input
                 type="text"
                 v-model="contacto.numeracion"
-                placeholder="Numeracion"
+                placeholder="Numeración"
               />
+              <p class="error-message" v-if="errors.numeracion">
+                Este campo es requerido.
+              </p>
             </div>
             <div class="col-12">
               <input
@@ -131,11 +155,10 @@
                 v-model="metodoEntrega"
                 @change="actualizarCostoEnvio(0)"
               />
-              <label for="entrega1"
-                >Entrega presencial (Av. Francisco Bilbao 1841, Providencia) de
-                lunes a viernes. Te contactaremos para coordinar la entrega.
-                $0</label
-              >
+              <label for="entrega1">
+                Entrega presencial (Av. Francisco Bilbao 1841, Providencia) de
+                lunes a viernes. Te contactaremos para coordinar la entrega. $0
+              </label>
             </div>
             <div>
               <input
@@ -160,8 +183,13 @@
               <label for="entrega3">Envío por pagar Bluexpress $0</label>
             </div>
           </div>
+          <p class="error-message" v-if="errors.metodoEntrega">
+            Por favor, seleccione un método de entrega.
+          </p>
           <button @click="nextStep" type="submit">Ir a Pago</button>
-          <button @click="prevStep" type="button">Volver a Información</button>
+          <button @click="prevStep" type="button" class="mt-1">
+            Volver a Información
+          </button>
         </div>
         <div v-else-if="currentStep === 3">
           <h3>Información de Orden</h3>
@@ -183,8 +211,7 @@
             <div>
               <label>Método de envío</label>
               <p>
-                {{ metodoEntregaText }}
-                - {{ precioChileno(costoEnvio) }}
+                {{ metodoEntregaText }} - {{ precioChileno(costoEnvio) }}
                 <a href="#" @click.prevent="prevStep">Editar</a>
               </p>
             </div>
@@ -221,7 +248,7 @@
               />
               <label for="pago1">
                 Pago Manual (Transferencia Bancaria)
-                <div>
+                <div class="pago-manual-info">
                   <p>Dejotaprint Spa</p>
                   <p>77.807.896-1</p>
                   <p>Banco Bci</p>
@@ -263,6 +290,9 @@
                   v-model="factura.nombreFacturacion"
                   placeholder="Nombre"
                 />
+                <p class="error-message" v-if="errors.nombreFacturacion">
+                  Este campo es requerido.
+                </p>
               </div>
               <div class="col-6">
                 <input
@@ -270,6 +300,9 @@
                   v-model="factura.apellidoFacturacion"
                   placeholder="Apellido"
                 />
+                <p class="error-message" v-if="errors.apellidoFacturacion">
+                  Este campo es requerido.
+                </p>
               </div>
               <div class="col-12">
                 <input
@@ -277,6 +310,9 @@
                   v-model="factura.rutFacturacion"
                   placeholder="RUT"
                 />
+                <p class="error-message" v-if="errors.rutFacturacion">
+                  Este campo es requerido y debe ser un RUT válido.
+                </p>
               </div>
               <div class="col-12">
                 <input
@@ -284,6 +320,9 @@
                   v-model="factura.direccionFacturacion"
                   placeholder="Dirección"
                 />
+                <p class="error-message" v-if="errors.direccionFacturacion">
+                  Este campo es requerido.
+                </p>
               </div>
               <div class="col-12">
                 <input
@@ -291,6 +330,9 @@
                   v-model="factura.correoFacturacion"
                   placeholder="Correo electrónico"
                 />
+                <p class="error-message" v-if="errors.correoFacturacion">
+                  Este campo es requerido y debe ser un correo válido.
+                </p>
               </div>
               <div class="col-12">
                 <input
@@ -313,6 +355,9 @@
                     {{ region.region }}
                   </option>
                 </select>
+                <p class="error-message" v-if="errors.regionFacturacion">
+                  Este campo es requerido.
+                </p>
               </div>
               <div class="col-12">
                 <select v-model="factura.comunaFacturacion">
@@ -325,6 +370,9 @@
                     {{ comuna }}
                   </option>
                 </select>
+                <p class="error-message" v-if="errors.comunaFacturacion">
+                  Este campo es requerido.
+                </p>
               </div>
               <div class="col-12">
                 <input
@@ -369,15 +417,29 @@
         <div class="order-summary">
           <h3>Resumen del pedido</h3>
           <p>Subtotal: {{ precioChileno(totalCarro) }}</p>
+          <p>IVA: {{ precioChileno(totalIva) }}</p>
+          <p>Total con IVA: {{ precioChileno(totalCarroConIva) }}</p>
           <p>Costo de envío: {{ precioChileno(costoEnvio) }}</p>
-          <p>Total: {{ precioChileno(totalCarro + costoEnvio) }}</p>
-          <input type="text" placeholder="Código de descuento" />
-          <button>APLICAR</button>
+          <p v-if="descuentoAplicado">
+            Descuento: -{{ precioChileno(descuento) }}
+          </p>
+          <p>
+            Total:
+            {{ precioChileno(totalCarroConIva + costoEnvio - descuento) }}
+          </p>
+          <input
+            type="text"
+            v-model="codigoDescuento"
+            placeholder="Código de descuento"
+          />
+          <button @click="aplicarDescuento">APLICAR</button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+
 <script>
 import { regionesData } from "@/data/regiones";
 import Swal from "sweetalert2";
@@ -394,7 +456,7 @@ export default {
         region: "",
         comuna: "",
         direccion: "",
-        casa: "",
+        apartamento: "",
         numeracion: "",
         instruccionesEspeciales: "",
       },
@@ -415,17 +477,52 @@ export default {
       metodoEntrega: null,
       metodoPago: null,
       facturacionIgual: true,
+      errors: {
+        email: false,
+        rut: false,
+        nombre: false,
+        apellido: false,
+        telefono: false,
+        region: false,
+        comuna: false,
+        direccion: false,
+        numeracion: false,
+        metodoEntrega: false,
+        nombreFacturacion: false,
+        apellidoFacturacion: false,
+        rutFacturacion: false,
+        direccionFacturacion: false,
+        correoFacturacion: false,
+        regionFacturacion: false,
+        comunaFacturacion: false,
+      },
+      codigoDescuento: "",
+      descuento: 0,
+      descuentoAplicado: false,
     };
   },
   computed: {
     productosEnCarro() {
-      return this.$store.state.carro;
+      return this.$store.state.carro.map((producto) => ({
+        ...producto,
+        iva: producto.iva || 0, // Asegúrate de que cada producto tenga el campo 'iva'
+      }));
     },
     totalCarro() {
       return this.productosEnCarro.reduce(
         (total, producto) => total + producto.precio * producto.cantidad,
         0
       );
+    },
+    totalIva() {
+      return this.productosEnCarro.reduce(
+        (total, producto) =>
+          total + (producto.precio * producto.cantidad * producto.iva) / 100,
+        0
+      );
+    },
+    totalCarroConIva() {
+      return this.totalCarro + this.totalIva;
     },
     costoEnvio() {
       return this.$store.state.costoEnvio;
@@ -466,34 +563,95 @@ export default {
           : [];
       }
     },
+    validarEmail(email) {
+      const re =
+        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\.,;:\s@"]+\.)+[^<>()[\]\.,;:\s@"]{2,})$/i;
+      return re.test(String(email).toLowerCase());
+    },
+    validarRUT(rut) {
+      const re = /^\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]$/;
+      return re.test(rut);
+    },
     validarDatosInformacion() {
-      const { email, rut } = this.contacto;
-      if (!email || !rut) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Por favor, complete todos los campos obligatorios en Información de contacto.",
-        });
-        return false;
-      }
-      return true;
+      const {
+        email,
+        rut,
+        nombre,
+        apellido,
+        telefono,
+        region,
+        comuna,
+        direccion,
+        numeracion,
+      } = this.contacto;
+      this.errors.email = !email || !this.validarEmail(email);
+      this.errors.rut = !rut || !this.validarRUT(rut);
+      this.errors.nombre = !nombre;
+      this.errors.apellido = !apellido;
+      this.errors.telefono = !telefono;
+      this.errors.region = !region;
+      this.errors.comuna = !comuna;
+      this.errors.direccion = !direccion;
+      this.errors.numeracion = !numeracion;
+      return (
+        !this.errors.email &&
+        !this.errors.rut &&
+        !this.errors.nombre &&
+        !this.errors.apellido &&
+        !this.errors.telefono &&
+        !this.errors.region &&
+        !this.errors.comuna &&
+        !this.errors.direccion &&
+        !this.errors.numeracion
+      );
+    },
+    validarDatosFacturacion() {
+      const {
+        nombreFacturacion,
+        apellidoFacturacion,
+        rutFacturacion,
+        direccionFacturacion,
+        correoFacturacion,
+        regionFacturacion,
+        comunaFacturacion,
+      } = this.factura;
+      this.errors.nombreFacturacion = !nombreFacturacion;
+      this.errors.apellidoFacturacion = !apellidoFacturacion;
+      this.errors.rutFacturacion =
+        !rutFacturacion || !this.validarRUT(rutFacturacion);
+      this.errors.direccionFacturacion = !direccionFacturacion;
+      this.errors.correoFacturacion =
+        !correoFacturacion || !this.validarEmail(correoFacturacion);
+      this.errors.regionFacturacion = !regionFacturacion;
+      this.errors.comunaFacturacion = !comunaFacturacion;
+      return (
+        !this.errors.nombreFacturacion &&
+        !this.errors.apellidoFacturacion &&
+        !this.errors.rutFacturacion &&
+        !this.errors.direccionFacturacion &&
+        !this.errors.correoFacturacion &&
+        !this.errors.regionFacturacion &&
+        !this.errors.comunaFacturacion
+      );
     },
     validarMetodoEntrega() {
-      if (!this.metodoEntrega) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Por favor, seleccione un método de entrega.",
-        });
-        return false;
-      }
-      return true;
+      this.errors.metodoEntrega = !this.metodoEntrega;
+      return !this.errors.metodoEntrega;
+    },
+    validarProductosEnCarro() {
+      return this.productosEnCarro.length > 0;
     },
     nextStep() {
       if (this.currentStep === 1) {
-        if (this.validarDatosInformacion()) {
+        if (this.validarDatosInformacion() && this.validarProductosEnCarro()) {
           this.$store.commit("setContacto", this.contacto);
           this.currentStep++;
+        } else if (!this.validarProductosEnCarro()) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Debe tener al menos un producto en el carrito para continuar.",
+          });
         }
       } else if (this.currentStep === 2) {
         if (this.validarMetodoEntrega()) {
@@ -517,22 +675,35 @@ export default {
     },
     async realizarPedido() {
       if (this.metodoPago) {
+        if (!this.facturacionIgual && !this.validarDatosFacturacion()) {
+          return;
+        }
+
+        Swal.fire({
+          title: "Procesando pedido",
+          text: "Por favor, espera...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
         try {
           const pedidoData = {
             metodo_envio: this.metodoEntrega,
             costo_envio: this.costoEnvio,
             metodo_pago: this.metodoPago,
-            total: this.totalCarro + this.costoEnvio,
+            total: this.totalCarroConIva + this.costoEnvio - this.descuento, // Asegúrate de restar el descuento aquí
             contacto: this.contacto,
             factura: this.facturacionIgual ? this.contacto : this.factura,
             productos: this.productosEnCarro.map((producto) => ({
               producto_id: producto.id,
               cantidad: producto.cantidad,
               precio: producto.precio,
+              nombre: producto.nombre,
             })),
+            descuentoAplicado: this.descuento, // Añadir aquí
           };
-
-          console.log("Datos enviados al backend:", pedidoData);
 
           const response = await fetch("http://localhost:3000/api/pedidos", {
             method: "POST",
@@ -547,9 +718,7 @@ export default {
           }
 
           const result = await response.json();
-          console.log("Pedido creado correctamente:", result);
 
-          // Limpieza del Carro
           await fetch("/api/carro/limpiar", {
             method: "POST",
             headers: {
@@ -558,7 +727,12 @@ export default {
             body: JSON.stringify({ session_id: this.$store.state.session_id }),
           });
 
-          // Redirigir a la página de éxito con el pedidoId
+          Swal.fire({
+            icon: "success",
+            title: "Pedido realizado",
+            text: "Tu pedido ha sido realizado con éxito.",
+          });
+
           this.$router.push({ name: "Exito", params: { pedidoId: result.id } });
         } catch (error) {
           console.error("Error:", error);
@@ -576,7 +750,6 @@ export default {
         });
       }
     },
-
     formatRUT(rut) {
       if (!rut) return ""; // Verificación para evitar undefined o null
       let value = rut.replace(/\./g, "").replace(/-/g, "");
@@ -591,24 +764,69 @@ export default {
       }
       return value;
     },
+    async aplicarDescuento() {
+      try {
+        const productosIds = this.productosEnCarro.map(
+          (producto) => producto.id
+        );
+        const response = await fetch(
+          `http://localhost:3000/api/descuentos/${
+            this.codigoDescuento
+          }?productos=${productosIds.join(",")}`
+        );
+        if (!response.ok) {
+          throw new Error("Error al verificar el código de descuento");
+        }
+        const result = await response.json();
+        if (result && result.descuento) {
+          const descuento = (this.totalCarroConIva * result.descuento) / 100;
+          this.descuento = descuento;
+          this.descuentoAplicado = true;
+          this.$store.commit("setDescuento", descuento);
+          Swal.fire({
+            icon: "success",
+            title: "Descuento aplicado",
+            text: `Se ha aplicado un descuento del ${Math.round(
+              Number(result.descuento)
+            )}%`,
+          });
+        } else {
+          this.descuento = 0;
+          this.descuentoAplicado = false;
+          Swal.fire({
+            icon: "error",
+            title: "Código inválido",
+            text: "El código de descuento ingresado no es válido o no aplicable a los productos seleccionados.",
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Ocurrió un error al verificar el código de descuento.",
+        });
+      }
+    },
   },
   mounted() {
     this.contacto = this.$store.state.contacto;
   },
 };
 </script>
-
 <style scoped>
 @import url(https://fonts.googleapis.com/css?family=Montserrat);
+
 * {
   box-sizing: border-box;
 }
 
 .container {
+  position: relative;
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
-  margin-top: 100px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .bar__container {
@@ -619,17 +837,17 @@ export default {
 
 .bar {
   counter-reset: step;
-  margin: 0;
-  padding: 0;
   display: flex;
   justify-content: space-between;
+  padding: 0;
+  margin: 0;
 }
 
 .bar li {
   list-style-type: none;
-  width: 30%;
   position: relative;
   text-align: center;
+  flex: 1;
   font-size: 14px;
   color: #333;
 }
@@ -664,33 +882,25 @@ export default {
 }
 
 .bar li.active:before {
-  background: #27ae60;
-  border: 1px solid #89e5b0;
+  background: #000;
+  border: 1px solid #ccc;
   color: white;
 }
 
 .bar li.active + li.active:after {
-  background: #27ae60;
+  background: #000;
 }
 
 .content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 20px;
 }
 
 .left,
 .right {
-  flex: 1;
   margin: 0 10px;
-}
-
-.left {
-  max-width: 60%;
-}
-
-.right {
-  max-width: 35%;
+  width: 100%;
 }
 
 .cart-summary,
@@ -717,10 +927,14 @@ export default {
   margin: 0;
 }
 
+.product-image {
+  margin: 0px;
+}
+
 .edit-cart {
   display: block;
   margin-top: 10px;
-  color: #27ae60;
+  color: #000;
   text-decoration: none;
 }
 
@@ -746,11 +960,13 @@ select {
   margin: 10px 0;
   border: 1px solid #ddd;
   border-radius: 5px;
+  background-color: #f8f9fa;
+  color: #495057;
 }
 
 button {
   padding: 10px 20px;
-  background: #27ae60;
+  background: #000;
   color: white;
   border: none;
   border-radius: 5px;
@@ -758,7 +974,7 @@ button {
 }
 
 button:hover {
-  background: #1e8c4a;
+  background: #333;
 }
 
 .row {
@@ -776,17 +992,43 @@ button:hover {
   padding: 0 10px;
 }
 
+/* Estilos específicos para métodos de envío */
+.metodo-entrega div,
+.metodos-pago div {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.metodo-entrega input[type="radio"],
+.metodos-pago input[type="radio"] {
+  margin-right: 10px;
+}
+
+.metodo-entrega label,
 .metodos-pago label {
   display: block;
+  width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  margin-bottom: 10px;
   cursor: pointer;
+  margin-left: 10px; /* Adjust margin for better alignment */
 }
 
-.metodos-pago input[type="radio"] {
-  margin-right: 10px;
+.metodo-entrega input[type="radio"]:checked + label,
+.metodos-pago input[type="radio"]:checked + label {
+  background: #f0f0f0;
+  border-color: #333;
+}
+
+.metodos-pago .pago-manual-info {
+  margin-left: 0; /* Remove left margin */
+  margin-top: 10px; /* Add top margin */
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .order-info {
@@ -795,5 +1037,37 @@ button:hover {
 
 .order-info div {
   margin-bottom: 10px;
+}
+
+/* Media Queries */
+@media (min-width: 768px) {
+  .content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .left {
+    max-width: 60%;
+  }
+
+  .right {
+    max-width: 35%;
+  }
+}
+
+/* Media Queries */
+@media (min-width: 768px) {
+  .content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .left {
+    max-width: 60%;
+  }
+
+  .right {
+    max-width: 35%;
+  }
 }
 </style>

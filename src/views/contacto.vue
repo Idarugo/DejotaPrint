@@ -71,9 +71,28 @@ export default {
       fecha: "",
     };
   },
+  computed: {
+    nombreLimpio() {
+      return this.nombre.trim();
+    },
+    correoLimpio() {
+      return this.correo.trim();
+    },
+    telefonoLimpio() {
+      return this.telefono.trim();
+    },
+    mensajeLimpio() {
+      return this.mensaje.trim();
+    },
+  },
   methods: {
     enviarMensaje() {
-      if (this.nombre && this.correo && this.telefono && this.mensaje) {
+      if (
+        this.nombreLimpio &&
+        this.correoLimpio &&
+        this.telefonoLimpio &&
+        this.mensajeLimpio
+      ) {
         // Obtener la fecha actual sin la hora
         const ahora = new Date();
         const dia = ahora.getDate().toString().padStart(2, "0");
@@ -84,10 +103,10 @@ export default {
         // Realizar la solicitud HTTP POST a la ruta /api/contactos
         axios
           .post("http://localhost:3000/api/contactos", {
-            nombre: this.nombre,
-            correo: this.correo,
-            telefono: this.telefono,
-            mensaje: this.mensaje,
+            nombre: this.nombreLimpio,
+            correo: this.correoLimpio,
+            telefono: this.telefonoLimpio,
+            mensaje: this.mensajeLimpio,
             fecha: this.fecha, // Usar la fecha actual
           })
           .then((response) => {
@@ -128,60 +147,5 @@ export default {
 </script>
 
 <style scoped>
-.contact-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  margin-top: 50px;
-}
-
-.contact-form h2 {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.contact-form p {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #666;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.form-group textarea {
-  resize: vertical;
-}
-
-button {
-  width: 100%;
-  padding: 1rem;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #555;
-}
+@import "../assets/styles/views/contacto.css";
 </style>

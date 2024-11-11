@@ -1,74 +1,56 @@
-main-content {
-  padding: 20px;
-}
-
-.contact-section {
-  align-items: flex-start;
-  display: flex;
-  justify-content: space-between;
-}
-
 .contact-form {
-  flex: 1;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  margin-top: 50px;
+  max-width: 600px;
+  padding: 2rem;
 }
 
-.contact-info {
-  flex: 1;
-  padding-left: 20px;
+.contact-form h2 {
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
-.contact-info h4 {
-  margin-bottom: 10px;
+.contact-form p {
+  color: #666;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.contact-info p {
-  margin-bottom: 5px;
-}
-
-.contact-info ul {
-  padding-left: 20px;
-}
-
-/* Estilos para el formulario */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
 }
 
-.input-field {
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group textarea {
   border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 4px;
+  padding: 0.5rem;
   width: 100%;
 }
 
-.submit-btn {
-  background-color: #4caf50;
+.form-group textarea {
+  resize: vertical;
+}
+
+button {
+  background-color: #333;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   color: white;
   cursor: pointer;
-  font-size: 16px;
-  padding: 10px 20px;
-  text-transform: uppercase;
-}
-
-.submit-btn:hover {
-  background-color: #45a049;
-}
-
-/* Estilos para las fotos decorativas */
-.decorative-photos {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.decorative-photos .photo {
-  flex: 1;
-}
-
-.decorative-photos .photo img {
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  padding: 1rem;
   width: 100%;
+}
+
+button:hover {
+  background-color: #555;
 }

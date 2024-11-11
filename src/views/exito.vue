@@ -41,7 +41,16 @@
     <div class="resumen-pedido">
       <h4>Resumen del pedido</h4>
       <p>Subtotal: {{ precioChileno(totalCarro) }}</p>
-      <p>Total: {{ precioChileno(totalCarro + costoEnvio) }}</p>
+      <p>IVA: {{ precioChileno(totalIva) }}</p>
+      <p>Total con IVA: {{ precioChileno(totalCarroConIva) }}</p>
+      <p>Costo de envío: {{ precioChileno(costoEnvio) }}</p>
+      <p v-if="descuentoAplicado">
+        Descuento aplicado: -{{ precioChileno(descuentoAplicado) }}
+      </p>
+      <p>
+        Total:
+        {{ precioChileno(totalCarroConIva + costoEnvio - descuentoAplicado) }}
+      </p>
     </div>
     <button @click="volverAInicio">VOLVER Y SEGUIR COMPRANDO</button>
   </div>
@@ -76,8 +85,22 @@ export default {
         return total + producto.precio * producto.cantidad;
       }, 0);
     },
+    totalIva() {
+      return this.$store.state.carro.reduce((total, producto) => {
+        return (
+          total +
+          (producto.precio * producto.cantidad * (producto.iva || 0)) / 100
+        );
+      }, 0);
+    },
+    totalCarroConIva() {
+      return this.totalCarro + this.totalIva;
+    },
     costoEnvio() {
       return this.$store.state.costoEnvio;
+    },
+    descuentoAplicado() {
+      return this.$store.state.descuentoAplicado;
     },
     precioChileno() {
       return (precio) => {
@@ -85,10 +108,17 @@ export default {
       };
     },
   },
+
   methods: {
     volverAInicio() {
       this.$router.push({ name: "Inicio" });
     },
+  },
+  created() {
+    if (!this.pedidoId || !this.$store.state.contacto.nombre) {
+      // Si no hay pedidoId o el nombre del contacto está vacío, redirige al usuario a la página de inicio
+      this.$router.push({ name: "Inicio" });
+    }
   },
 };
 </script>
@@ -97,32 +127,40 @@ export default {
 .exito-container {
   max-width: 800px;
   margin: 0 auto;
+  margin-top: 120px; /* Ajusta este valor según la altura de tu header */
   padding: 20px;
-  background: #f9f9f9;
+  background: #ffffff; /* Fondo blanco */
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 h2 {
   text-align: center;
   margin-bottom: 20px;
+  color: #333333; /* Color de texto plomo oscuro */
 }
+
 p {
   margin: 10px 0;
+  color: #333333; /* Color de texto plomo oscuro */
 }
+
 button {
   display: block;
   width: 100%;
   padding: 10px;
-  background: #27ae60;
+  background: #000000; /* Fondo negro */
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   margin-top: 20px;
 }
+
 button:hover {
-  background: #1e8c4a;
+  background: #333333; /* Fondo negro oscuro al pasar el cursor */
 }
+
 .estado-pago,
 .informacion-pago,
 .informacion-envio,
@@ -130,14 +168,26 @@ button:hover {
 .resumen-pedido {
   margin: 20px 0;
   padding: 10px;
-  background: white;
-  border: 1px solid #ddd;
+  background: #ffffff; /* Fondo blanco */
+  border: 1px solid #dddddd; /* Borde plomo claro */
   border-radius: 5px;
 }
+
 h3 {
   text-align: center;
+  color: #333333; /* Color de texto plomo oscuro */
 }
+
 h4 {
   margin-bottom: 10px;
+  color: #333333; /* Color de texto plomo oscuro */
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .exito-container {
+    padding: 20px 10px;
+    margin-top: 140px; /* Ajusta este valor según la altura de tu header en dispositivos móviles */
+  }
 }
 </style>
